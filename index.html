@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KS2 Arithmetic Quiz</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Arial, sans-serif; background: #f5f5f5; color: #222; padding: 20px; }
+  .wrap { max-width: 640px; margin: 0 auto; }
+  h1 { font-size: 22px; font-weight: 600; margin-bottom: 6px; }
+  .subtitle { font-size: 14px; color: #666; margin-bottom: 24px; }
+  .card { background: #fff; border: 1px solid #e0e0e0; border-radius: 10px; padding: 16px 20px; margin-bottom: 12px; }
+  .q-row { display: flex; align-items: center; gap: 12px; }
+  .q-num { font-size: 13px; color: #888; min-width: 30px; }
+  .q-text { font-size: 17px; flex: 1; }
+  .q-input { width: 130px; height: 38px; border: 1px solid #ccc; border-radius: 8px; padding: 0 10px; font-size: 15px; text-align: center; background: #fafafa; }
+  .q-input:focus { outline: none; border-color: #4a90e2; box-shadow: 0 0 0 2px rgba(74,144,226,0.2); }
+  .feedback { font-size: 13px; margin-top: 8px; padding: 6px 10px; border-radius: 6px; display: none; }
+  .correct { background: #e8f5e9; color: #2e7d32; }
+  .incorrect { background: #ffebee; color: #c62828; }
+  .name-row { display: flex; flex-direction: column; gap: 6px; margin-bottom: 20px; }
+  .name-row label { font-size: 14px; color: #555; }
+  .name-input { height: 38px; border: 1px solid #ccc; border-radius: 8px; padding: 0 12px; font-size: 15px; width: 100%; background: #fafafa; }
+  .name-input:focus { outline: none; border-color: #4a90e2; }
+  .submit-btn { width: 100%; height: 44px; margin-top: 8px; font-size: 16px; font-weight: 600; cursor: pointer; border-radius: 8px; border: none; background: #4a90e2; color: #fff; }
+  .submit-btn:hover { background: #357abd; }
+  .submit-btn:disabled { background: #aaa; cursor: not-allowed; }
+  .score-card { display: none; background: #fff; border: 1px solid #e0e0e0; border-radius: 10px; padding: 24px; margin-top: 16px; text-align: center; }
+  .score-num { font-size: 48px; font-weight: 700; color: #4a90e2; }
+  .score-label { font-size: 16px; color: #666; margin-top: 4px; }
+  .score-msg { font-size: 14px; color: #444; margin-top: 12px; }
+  .reset-btn { margin-top: 16px; padding: 10px 28px; font-size: 14px; cursor: pointer; border-radius: 8px; border: 1px solid #ccc; background: #fff; color: #333; }
+  .reset-btn:hover { background: #f5f5f5; }
+  .sending { font-size: 13px; color: #888; margin-top: 8px; text-align: center; }
+  .points { font-size: 12px; color: #aaa; margin-left: auto; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>KS2 SATs Arithmetic Quiz</h1>
+  <p class="subtitle">You have 30 minutes to complete this test. Work as quickly and as carefully as you can.</p>
+
+  <div class="card">
+    <div class="name-row">
+      <label for="studentName">Full name</label>
+      <input class="name-input" type="text" id="studentName" placeholder="Enter your full name" />
+    </div>
+  </div>
+
+  <div id="questions"></div>
+
+  <button class="submit-btn" id="submitBtn" onclick="submitQuiz()">Submit answers</button>
+  <p class="sending" id="sendingMsg"></p>
+
+  <div class="score-card" id="scoreCard">
+    <div class="score-num" id="scoreNum"></div>
+    <div class="score-label" id="scoreLabel"></div>
+    <div class="score-msg" id="scoreMsg"></div>
+    <button class="reset-btn" onclick="resetQuiz()">Try again</button>
+  </div>
+</div>
+
+<script>
+const SHEET_ID = '1TYxVIM-Kn_gysvRzcvRZF4nU9FeHmfZa9w7ymIsjnKc';
+
+const questions = [
+  { num: 'Q1', text: '689 + 38 =', answers: ['727'], points: 1 },
+  { num: 'Q2', text: '72 ÷ 3 =', answers: ['24'], points: 1 },
+  { num: 'Q3', text: '23 × 6 =', answers: ['138'], points: 1 },
+  { num: 'Q4', text: '4,532 − 19 =', answers: ['4513','4,513'], points: 1 },
+  { num: 'Q5', text: '3 × 391 =', answers: ['1173','1,173'], points: 1 },
+  { num: 'Q6', text: '___ = 9,171 − 530', answers: ['8641','8,641'], points: 1 },
+  { num: 'Q7', text: '6,600 ÷ 6 =', answers: ['1100','1,100'], points: 1 },
+  { num: 'Q8', text: '99 × 10 × 1 =', answers: ['990'], points: 1 },
+  { num: 'Q9', text: '7.68 + 13.493 =', answers: ['21.173'], points: 1 },
+  { num: 'Q10', text: '9 × 752 =', answers: ['6768','6,768'], points: 1 },
+  { num: 'Q11', text: '640 ÷ 8 =', answers: ['80'], points: 1 },
+  { num: 'Q12', text: '___ = 357 − 89', answers: ['268'], points: 1 },
+  { num: 'Q13', text: '561 ÷ 3 =', answers: ['187'], points: 1 },
+  { num: 'Q14', text: '4/6 × 1/8 =', answers: ['1/12','4/48','2/24'], points: 1 },
+  { num: 'Q15', text: '___ = 630 ÷ 7', answers: ['90'], points: 1 },
+  { num: 'Q16', text: '6,020,070 = 6,000,000 + ___ + 70', answers: ['20000','20,000'], points: 1 },
+  { num: 'Q17', text: '2,671 × 1,000 =', answers: ['2671000','2,671,000'], points: 1 },
+  { num: 'Q18', text: '5/12 + 1/3 =', answers: ['3/4','9/12','6/8'], points: 1 },
+  { num: 'Q19', text: '2/3 + 4/5 =', answers: ['22/15','1 7/15'], points: 1 },
+  { num: 'Q20', text: '6,312 × 14 =', answers: ['88368','88,368'], points: 2 },
+  { num: 'Q21', text: '2 + 3³ =', answers: ['29'], points: 1 },
+  { num: 'Q22', text: '15.5 ÷ 100 =', answers: ['0.155'], points: 1 },
+  { num: 'Q23', text: '90 − 56 ÷ 8 =', answers: ['83'], points: 1 },
+  { num: 'Q24', text: '63 − 5.8 =', answers: ['57.2'], points: 1 },
+  { num: 'Q25', text: '418 × 47 =', answers: ['19646','19,646'], points: 2 },
+  { num: 'Q26', text: '6/7 − 11/21 =', answers: ['7/21','1/3','18/63'], points: 1 },
+  { num: 'Q27', text: '7/10 ÷ 2 =', answers: ['7/20','14/40'], points: 1 },
+  { num: 'Q28', text: '2 3/8 − 5/8 =', answers: ['1 6/8','1 3/4','14/8','7/4'], points: 1 },
+  { num: 'Q29', text: '0.7 × 26 =', answers: ['18.2'], points: 1 },
+  { num: 'Q30', text: '986 ÷ 34 =', answers: ['29'], points: 2 },
+  { num: 'Q31', text: '99% of 600 =', answers: ['594'], points: 1 },
+  { num: 'Q32', text: '1/2 ÷ 3 =', answers: ['1/6','2/12'], points: 1 },
+  { num: 'Q33', text: '43% of 900 =', answers: ['387'], points: 1 },
+  { num: 'Q34', text: '2 1/6 − 2/3 =', answers: ['1 1/2','1 3/6','3/2','9/6'], points: 1 },
+  { num: 'Q35', text: '1 1/4 × 39 =', answers: ['48 3/4','195/4'], points: 1 },
+  { num: 'Q36', text: '4,234 ÷ 73 =', answers: ['58'], points: 2 }
+];
+
+const totalPoints = questions.reduce((s, q) => s + q.points, 0);
+
+function normalise(val) {
+  return val.trim().toLowerCase().replace(/,/g, '').replace(/\s+/g, ' ');
+}
+
+function isCorrect(input, answers) {
+  const n = normalise(input);
+  return answers.some(a => normalise(a) === n);
+}
+
+function buildQuiz() {
+  const container = document.getElementById('questions');
+  container.innerHTML = '';
+  questions.forEach((q, i) => {
+    container.innerHTML += `
+      <div class="card">
+        <div class="q-row">
+          <span class="q-num">${q.num}</span>
+          <span class="q-text">${q.text}</span>
+          <span class="points">${q.points === 2 ? '2 marks' : '1 mark'}</span>
+          <input class="q-input" type="text" id="input-${i}" placeholder="Answer" autocomplete="off" />
+        </div>
+        <div class="feedback" id="feedback-${i}"></div>
+      </div>`;
+  });
+}
+
+function submitQuiz() {
+  const name = document.getElementById('studentName').value.trim();
+  if (!name) { alert('Please enter your name before submitting.'); return; }
+
+  let score = 0;
+  const responses = [];
+
+  questions.forEach((q, i) => {
+    const val = document.getElementById('input-' + i).value;
+    const fb = document.getElementById('feedback-' + i);
+    fb.style.display = 'block';
+    const correct = isCorrect(val, q.answers);
+    if (correct) score += q.points;
+    fb.className = 'feedback ' + (correct ? 'correct' : 'incorrect');
+    fb.textContent = correct ? 'Correct' : (val.trim() === '' ? 'No answer. Correct answer: ' + q.answers[0] : 'Incorrect. Correct answer: ' + q.answers[0]);
+    responses.push(val || '');
+  });
+
+  const card = document.getElementById('scoreCard');
+  card.style.display = 'block';
+  document.getElementById('scoreNum').textContent = score + ' / ' + totalPoints;
+  document.getElementById('scoreLabel').textContent = 'Total marks';
+  document.getElementById('scoreMsg').textContent = 'Well done ' + name + '! Your results have been recorded.';
+
+  document.getElementById('submitBtn').disabled = true;
+  document.getElementById('sendingMsg').textContent = 'Sending results...';
+
+  sendToSheet(name, score, responses);
+}
+
+function sendToSheet(name, score, responses) {
+  const url = `https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec`;
+  const data = { name, score, total: totalPoints, responses, timestamp: new Date().toISOString() };
+  fetch(url, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  }).then(() => {
+    document.getElementById('sendingMsg').textContent = 'Results sent.';
+  }).catch(() => {
+    document.getElementById('sendingMsg').textContent = 'Could not send results. Please screenshot your score.';
+  });
+}
+
+function resetQuiz() {
+  questions.forEach((q, i) => {
+    document.getElementById('input-' + i).value = '';
+    const fb = document.getElementById('feedback-' + i);
+    fb.style.display = 'none';
+  });
+  document.getElementById('scoreCard').style.display = 'none';
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('sendingMsg').textContent = '';
+  document.getElementById('studentName').value = '';
+}
+
+buildQuiz();
+</script>
+</body>
+</html>
