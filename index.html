@@ -162,7 +162,7 @@ function submitQuiz() {
 }
 
 function sendToSheet(name, score, responses) {
-  const url = `https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec`;
+  const url = `https://script.google.com/macros/s/AKfycbydhV-_7AdRXAcMSNAWpc6JSIIf2r1PiIoAKgaGG-4-Qvsl3AWwJlFq6dOKkOU8Rn-K/exec`;
   const data = { name, score, total: totalPoints, responses, timestamp: new Date().toISOString() };
   fetch(url, {
     method: 'POST',
