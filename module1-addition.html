@@ -211,6 +211,34 @@
     .score-display  { font-family: 'Fraunces', serif; font-size: 3.5rem; font-weight: 800; color: #0D0080; margin: 16px 0 4px; }
     .score-label    { color: #4A4A4A; font-size: 0.95rem; }
 
+    .results-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 24px;
+      background: white;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    .results-table th {
+      background: #0D0080;
+      color: white;
+      padding: 12px 16px;
+      text-align: left;
+      font-size: 0.88rem;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .results-table td {
+      padding: 12px 16px;
+      border-bottom: 1px solid #eef1f5;
+      font-size: 0.93rem;
+      vertical-align: middle;
+    }
+    .results-table tr:last-child td { border-bottom: none; }
+    .results-table tr:nth-child(even) td { background: #f8fafc; }
+    .tick  { color: #27C47A; font-size: 1.2rem; font-weight: 700; }
+    .cross { color: #E24B4A; font-size: 1.2rem; font-weight: 700; }
+
     #locked-screen {
       display: none;
       background: white;
@@ -262,7 +290,7 @@
 <body>
 
 <header>
-  <img src="logo_cropped.png" alt="Steps 2 Success logo" />
+  <img src="logo_official.png" alt="Steps 2 Success logo" />
   <div>
     <h1>Module 1 — Addition</h1>
     <p>End of Module Test</p>
@@ -337,6 +365,16 @@
       <div class="score-display" id="score-display"></div>
       <p class="score-label" id="score-label"></p>
     </div>
+    <table class="results-table">
+      <thead>
+        <tr>
+          <th>Question</th>
+          <th>Your answer</th>
+          <th>Result</th>
+        </tr>
+      </thead>
+      <tbody id="results-body"></tbody>
+    </table>
   </div>
 
 </div>
@@ -572,14 +610,26 @@
 
     localStorage.setItem(LOCK_KEY, '1');
     closePopup('popup-confirm');
-    showResult(name, earnedMarks, totalMarks);
+    showResult(name, earnedMarks, totalMarks, answerDetails);
   }
 
-  function showResult(name, earned, total) {
+  function showResult(name, earned, total, details) {
     showScreen('result-screen');
     document.getElementById('result-name').textContent = name;
     document.getElementById('score-display').textContent = `${earned} / ${total}`;
     document.getElementById('score-label').textContent = `${Math.round((earned / total) * 100)}% — well done for completing the test!`;
+
+    const tbody = document.getElementById('results-body');
+    tbody.innerHTML = '';
+    details.forEach(d => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><strong>${d.question}</strong> &nbsp; ${d.text}</td>
+        <td>${d.userAnswer}</td>
+        <td>${d.correct ? '<span class="tick">✓</span>' : '<span class="cross">✗</span>'}</td>
+      `;
+      tbody.appendChild(tr);
+    });
   }
 </script>
 </body>
