@@ -375,6 +375,25 @@
       </thead>
       <tbody id="results-body"></tbody>
     </table>
+    <div class="finish-bar" id="result-buttons">
+      <button class="btn btn-primary" id="btn-review-incorrect" onclick="showReviewIncorrect()" style="display:none">Review incorrect answers</button>
+      <button class="btn btn-outline" onclick="finishAndClose()">Finish and return</button>
+    </div>
+  </div>
+
+  <div id="review-incorrect-screen">
+    <div class="review-incorrect-header">
+      <h2>Review incorrect answers</h2>
+      <p>These are the questions you didn't get right. Have another go — you can retry as many times as you like. This won't affect your score.</p>
+    </div>
+    <div class="video-prompt">
+      &#127916; Not sure how to approach these? Head back to the teaching videos for this module and work through the steps again before retrying.
+    </div>
+    <div id="incorrect-questions-area"></div>
+    <div class="finish-bar">
+      <button class="btn btn-outline" onclick="showScreen('result-screen')">← Back to results</button>
+      <button class="btn btn-primary" onclick="finishAndClose()">Finish and return</button>
+    </div>
   </div>
 
 </div>
@@ -443,7 +462,7 @@
   }
 
   function showScreen(id) {
-    ['locked-screen','quiz-screen','review-screen','result-screen']
+    ['locked-screen','quiz-screen','review-screen','result-screen','review-incorrect-screen']
       .forEach(s => document.getElementById(s).style.display = 'none');
     document.getElementById(id).style.display = 'block';
   }
@@ -613,6 +632,8 @@
     showResult(name, earnedMarks, totalMarks, answerDetails);
   }
 
+  let incorrectQuestions = [];
+
   function showResult(name, earned, total, details) {
     showScreen('result-screen');
     document.getElementById('result-name').textContent = name;
@@ -630,6 +651,66 @@
       `;
       tbody.appendChild(tr);
     });
+
+    // Store incorrect questions and show review button if any exist
+    incorrectQuestions = details.filter(d => !d.correct);
+    const reviewBtn = document.getElementById('btn-review-incorrect');
+    reviewBtn.style.display = incorrectQuestions.length > 0 ? 'inline-block' : 'none';
+  }
+
+  function showReviewIncorrect() {
+    showScreen('review-incorrect-screen');
+    const area = document.getElementById('incorrect-questions-area');
+    area.innerHTML = '';
+
+    incorrectQuestions.forEach((d, i) => {
+      const q = questions.find(q => q.num === d.question);
+      const card = document.createElement('div');
+      card.className = 'incorrect-question-card';
+      card.innerHTML = `
+        <div class="question-meta">${d.question} &nbsp;·&nbsp; ${d.category}</div>
+        <div class="question-text">${d.text}</div>
+        <p class="your-answer-note">Your answer: <strong>${d.userAnswer}</strong></p>
+        <input class="retry-input" type="text" id="retry-${i}" placeholder="Try again" autocomplete="off" autocorrect="off" spellcheck="false" />
+        <div class="retry-feedback" id="feedback-${i}"></div>
+        <button class="btn btn-secondary btn-check" onclick="checkRetry(${i})">Check answer</button>
+      `;
+      area.appendChild(card);
+
+      // Allow Enter key to check
+      card.querySelector(`#retry-${i}`).addEventListener('keydown', e => {
+        if (e.key === 'Enter') checkRetry(i);
+      });
+    });
+  }
+
+  function checkRetry(i) {
+    const input    = document.getElementById(`retry-${i}`);
+    const feedback = document.getElementById(`feedback-${i}`);
+    const q        = questions.find(q => q.num === incorrectQuestions[i].question);
+    const val      = input.value.trim();
+    if (!val) return;
+
+    if (isCorrect(val, q.answers)) {
+      feedback.textContent = '✓ Correct!';
+      feedback.className = 'retry-feedback correct';
+    } else {
+      feedback.textContent = '✗ Not quite — have another go.';
+      feedback.className = 'retry-feedback incorrect';
+    }
+  }
+
+  function finishAndClose() {
+    try {
+      window.close();
+    } catch(e) {}
+    // Fallback if browser blocks window.close()
+    document.body.innerHTML = `
+      <div style="font-family:'DM Sans',sans-serif; text-align:center; padding:60px 24px; color:#0D0D0D;">
+        <h2 style="font-family:'Fraunces',serif; color:#0D0080; margin-bottom:12px;">All done!</h2>
+        <p style="color:#4A4A4A;">You can now close this tab and return to your course.</p>
+      </div>
+    `;
   }
 </script>
 </body>
