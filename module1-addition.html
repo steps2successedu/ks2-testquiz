@@ -387,7 +387,7 @@
       <p>These are the questions you didn't get right. Have another go — you can retry as many times as you like. This won't affect your score.</p>
     </div>
     <div class="video-prompt">
-      &#127916; Not sure how to approach these? Head back to the teaching videos for this module and work through the steps again before retrying.
+      &#127916; &nbsp;<strong>Not sure how to approach these?</strong> Head back to the teaching videos for this module and work through the steps again before retrying.
     </div>
     <div id="incorrect-questions-area"></div>
     <div class="finish-bar">
@@ -668,8 +668,8 @@
       const card = document.createElement('div');
       card.className = 'incorrect-question-card';
       card.innerHTML = `
-        <div class="question-meta">${d.question} &nbsp;·&nbsp; ${d.category}</div>
-        <div class="question-text">${d.text}</div>
+        <div class="incorrect-q-meta">${d.question} &nbsp;·&nbsp; ${d.category}</div>
+        <div class="incorrect-q-text">${d.text}</div>
         <p class="your-answer-note">Your answer: <strong>${d.userAnswer}</strong></p>
         <input class="retry-input" type="text" id="retry-${i}" placeholder="Try again" autocomplete="off" autocorrect="off" spellcheck="false" />
         <div class="retry-feedback" id="feedback-${i}"></div>
