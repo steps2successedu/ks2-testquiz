@@ -7,6 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,600;0,700;1,700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: 'DM Sans', sans-serif; background: #F4F5FB; color: #0D0D0D; min-height: 100vh; }
@@ -91,6 +92,44 @@
 
     .spinner { display: inline-block; width: 20px; height: 20px; border: 3px solid rgba(0,0,0,0.2); border-top-color: #0D0D0D; border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 8px; }
     @keyframes spin { to { transform: rotate(360deg); } }
+  
+    .finish-bar { display:flex; gap:12px; flex-wrap:wrap; margin-top:20px; }
+    #review-incorrect-screen { display:none; }
+    .review-incorrect-header {
+      background:white; border-radius:10px; padding:24px 28px;
+      box-shadow:0 2px 8px rgba(0,0,0,0.08); margin-bottom:20px;
+    }
+    .review-incorrect-header h2 { font-family:'Fraunces',serif; color:#0D0080; margin-bottom:6px; }
+    .review-incorrect-header p  { color:#4A4A4A; font-size:0.95rem; line-height:1.5; }
+    .video-prompt {
+      background:#FFF8CC; border-left:4px solid #E8B800; border-radius:0 6px 6px 0;
+      padding:14px 18px; margin-bottom:20px; font-size:0.92rem; color:#333; line-height:1.5;
+    }
+    .incorrect-question-card {
+      background:white; border-radius:10px; padding:24px; margin-bottom:16px;
+      box-shadow:0 2px 8px rgba(0,0,0,0.08);
+    }
+    .incorrect-q-meta {
+      font-size:0.78rem; font-weight:700; color:#2AB8BC; text-transform:uppercase;
+      letter-spacing:0.06em; margin-bottom:10px;
+    }
+    .incorrect-q-text { font-family:'Fraunces',serif; font-size:1.2rem; font-weight:700; color:#0D0080; margin-bottom:10px; }
+    .your-answer-note { font-size:0.88rem; color:#E24B4A; margin-bottom:14px; }
+    .retry-input {
+      width:100%; max-width:280px; padding:10px 14px; border:2px solid #4A4A4A;
+      border-radius:6px; font-size:1.05rem; margin-bottom:10px; display:block;
+    }
+    .retry-input:focus { outline:none; border-color:#4A4A4A; }
+    .retry-input:disabled { background:#f0f0f0; color:#888; }
+    .btn-check {
+      background:white; color:#27C47A; border:2px solid #27C47A; padding:9px 22px;
+      border-radius:6px; font-weight:700; cursor:pointer; font-size:0.95rem;
+    }
+    .btn-check:disabled { opacity:0.4; cursor:not-allowed; }
+    .retry-feedback { margin:10px 0; font-weight:700; font-size:0.95rem; min-height:1.3em; }
+    .retry-feedback.correct { color:#27C47A; }
+    .retry-feedback.incorrect { color:#E24B4A; }
+    .retry-feedback.exhausted { color:#4A4A4A; font-weight:500; font-style:italic; }
   </style>
 </head>
 <body>
@@ -171,6 +210,25 @@
       <thead><tr><th>Question</th><th>Your answer</th><th>Result</th></tr></thead>
       <tbody id="results-body"></tbody>
     </table>
+    <div class="finish-bar" id="result-buttons">
+      <button class="btn btn-primary" id="btn-review-incorrect" onclick="showReviewIncorrect()" style="display:none">Review incorrect answers</button>
+      <button class="btn btn-outline" onclick="finishAndClose()">Finish and return</button>
+    </div>
+  </div>
+
+  <div id="review-incorrect-screen">
+    <div class="review-incorrect-header">
+      <h2>Review incorrect answers</h2>
+      <p>These are the questions you didn't get right. You get up to 3 tries on each — this is just practice, it won't change your recorded score.</p>
+    </div>
+    <div class="video-prompt">
+      &#127916; &nbsp;<strong>Not sure how to approach these?</strong> Head back to the teaching videos for this module and work through the steps again before retrying.
+    </div>
+    <div id="incorrect-questions-area"></div>
+    <div class="finish-bar">
+      <button class="btn btn-outline" onclick="showScreen('result-screen')">← Back to results</button>
+      <button class="btn btn-primary" onclick="finishAndClose()">Finish and return</button>
+    </div>
   </div>
 
 </div>
@@ -196,19 +254,37 @@
       { num:'Q6', text:'95% of 180 =', answers:['171'], points:1, cat:'Percentages' },
   ];
 
-  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbydhV-_7AdRXAcMSNAWpc6JSIIf2r1PiIoAKgaGG-4-Qvsl3AWwJlFq6dOKkOU8Rn-K/exec';
-  const LOCK_KEY = 's2s_mod19_submitted';
+  const SUPABASE_URL = 'https://qtclbjvxfyrkheyycyzp.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF0Y2xianZ4Znlya2hleXljeXpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY0NTg4NjMsImV4cCI6MjEwMjAzNDg2M30.guo6XSaSZML0DAV0HA1YtZ-QLdw2J3Xms8HflTBSePI';
+  const TEST_SLUG = 'module19-percentages';
+  const MAX_RETRY_ATTEMPTS = 3;
+
+  // Lazily create the Supabase client rather than at top level. If the
+  // supabase-js CDN script fails to load (network hiccup, school firewall,
+  // CDN outage), a top-level `supabase.createClient(...)` throws immediately
+  // and silently kills every function defined below it in this script --
+  // the whole quiz becomes unusable with no explanation. Deferring this
+  // means the quiz UI (rendering questions, typing answers, navigating)
+  // still works even if the backend connection is unavailable; only
+  // saving/submitting is affected, and those paths report the problem
+  // clearly instead of failing silently.
+  let _sb = null;
+  function getClient() {
+    if (_sb) return _sb;
+    if (typeof supabase === 'undefined') return null;
+    _sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    return _sb;
+  }
 
   let currentQ    = 0;
   let userAnswers = new Array(questions.length).fill('');
+  let attemptStarted = false;   // becomes true once start_or_resume_attempt has succeeded
+  let statusCheckInFlight = false;
+  let retryAttemptsUsed = [];   // per incorrect-question retry counter
 
   window.addEventListener('DOMContentLoaded', () => {
-    if (localStorage.getItem(LOCK_KEY)) {
-      showScreen('locked-screen');
-    } else {
-      showScreen('quiz-screen');
-      renderQuestion();
-    }
+    showScreen('quiz-screen');
+    renderQuestion();
   });
 
   window.addEventListener('beforeunload', e => {
@@ -218,8 +294,11 @@
   });
 
   function onDetailsInput() {
-    document.getElementById('student-name').classList.toggle('filled', !!document.getElementById('student-name').value.trim());
-    document.getElementById('student-email').classList.toggle('filled', !!document.getElementById('student-email').value.trim());
+    const nameEl  = document.getElementById('student-name');
+    const emailEl = document.getElementById('student-email');
+    nameEl.classList.toggle('filled', !!nameEl.value.trim());
+    emailEl.classList.toggle('filled', !!emailEl.value.trim());
+    maybeCheckStatus();
   }
 
   function getDetails() {
@@ -227,6 +306,41 @@
       name : document.getElementById('student-name').value.trim(),
       email: document.getElementById('student-email').value.trim(),
     };
+  }
+
+  let statusDebounce;
+  function maybeCheckStatus() {
+    clearTimeout(statusDebounce);
+    statusDebounce = setTimeout(checkStatus, 500);
+  }
+
+  async function checkStatus() {
+    const { name, email } = getDetails();
+    if (!name || !email || !email.includes('@') || statusCheckInFlight || attemptStarted) return;
+    const client = getClient();
+    if (!client) { console.warn('Backend unavailable — cannot verify attempt status yet.'); return; }
+    statusCheckInFlight = true;
+    try {
+      const { data, error } = await client.rpc('start_or_resume_attempt', {
+        p_test_slug: TEST_SLUG, p_first_name: name.split(' ')[0] || name,
+        p_last_name: name.split(' ').slice(1).join(' ') || '-', p_email: email,
+      });
+      if (error) { console.warn('status check error', error); return; }
+      if (data.status === 'locked') {
+        showScreen('locked-screen');
+      } else if (data.status === 'resumed') {
+        attemptStarted = true;
+        userAnswers = (data.answers || []).length ? data.answers.map(a => a.userAnswer || '') : userAnswers;
+        currentQ = Math.min(data.current_question_index || 0, questions.length - 1);
+        renderQuestion();
+      } else if (data.status === 'started') {
+        attemptStarted = true;
+      }
+    } catch (err) {
+      console.warn('Could not verify attempt status (offline?)', err);
+    } finally {
+      statusCheckInFlight = false;
+    }
   }
 
   function normalise(str) {
@@ -237,7 +351,7 @@
   }
 
   function showScreen(id) {
-    ['locked-screen','quiz-screen','review-screen','result-screen']
+    ['locked-screen','quiz-screen','review-screen','result-screen','review-incorrect-screen']
       .forEach(s => document.getElementById(s).style.display = 'none');
     document.getElementById(id).style.display = 'block';
   }
@@ -245,6 +359,19 @@
   function showQuiz() {
     showScreen('quiz-screen');
     renderQuestion();
+  }
+
+  function autosave() {
+    if (!attemptStarted) return;
+    const { email } = getDetails();
+    if (!email) return;
+    const client = getClient();
+    if (!client) return; // nothing to autosave to — quiz still works locally
+    const snapshot = questions.map((q, i) => ({ question: q.num, userAnswer: userAnswers[i] || '' }));
+    client.rpc('save_progress', {
+      p_test_slug: TEST_SLUG, p_email: email,
+      p_current_question_index: currentQ, p_answers: snapshot,
+    }).then(({ error }) => { if (error) console.warn('autosave failed', error); });
   }
 
   function renderQuestion() {
@@ -255,22 +382,35 @@
     document.getElementById('btn-prev').disabled = currentQ === 0;
 
     const btnNext = document.getElementById('btn-next');
-    btnNext.textContent = currentQ === questions.length - 1 ? 'Review answers →' : 'Next →';
+    btnNext.textContent = currentQ === questions.length - 1 ? 'Review answers \u2192' : 'Next \u2192';
 
     document.getElementById('question-area').innerHTML = `
       <div class="question-card">
-        <div class="question-meta">${q.num} &nbsp;·&nbsp; ${q.cat} &nbsp;·&nbsp; ${q.points} mark${q.points > 1 ? 's' : ''}</div>
+        <div class="question-meta">${q.num} &nbsp;\u00b7&nbsp; ${q.cat} &nbsp;\u00b7&nbsp; ${q.points} mark${q.points > 1 ? 's' : ''}</div>
         <div class="question-text">${q.text}</div>
-        <input class="answer-input" type="text" id="answer-input" value="${userAnswers[currentQ]}"
-          placeholder="Your answer or X" autocomplete="off" autocorrect="off" spellcheck="false" />
+        <input
+          class="answer-input"
+          type="text"
+          id="answer-input"
+          value="${userAnswers[currentQ]}"
+          placeholder="Your answer or X"
+          autocomplete="off"
+          autocorrect="off"
+          spellcheck="false"
+        />
         <p class="marks-note">If you don't know, enter <strong>X</strong> and move on.</p>
       </div>
     `;
 
     const inp = document.getElementById('answer-input');
     btnNext.disabled = inp.value.trim() === '';
-    inp.addEventListener('input', () => { btnNext.disabled = inp.value.trim() === ''; });
-    inp.addEventListener('keydown', e => { if (e.key === 'Enter' && !btnNext.disabled) nextOrReview(); });
+
+    inp.addEventListener('input', () => {
+      btnNext.disabled = inp.value.trim() === '';
+    });
+    inp.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && !btnNext.disabled) nextOrReview();
+    });
     inp.focus();
   }
 
@@ -279,32 +419,46 @@
     if (el) userAnswers[currentQ] = el.value.trim();
   }
 
-  function goTo(index) { saveCurrentAnswer(); currentQ = index; renderQuestion(); }
+  function goTo(index) {
+    saveCurrentAnswer();
+    autosave();
+    currentQ = index;
+    renderQuestion();
+  }
 
   function nextOrReview() {
     saveCurrentAnswer();
-    if (currentQ < questions.length - 1) { currentQ++; renderQuestion(); }
-    else showReview();
+    autosave();
+    if (currentQ < questions.length - 1) {
+      currentQ++;
+      renderQuestion();
+    } else {
+      showReview();
+    }
   }
 
   function showReview() {
     showScreen('review-screen');
-    const tbody = document.getElementById('review-body');
+    const tbody  = document.getElementById('review-body');
     tbody.innerHTML = '';
     let hasBlank = false;
+
     questions.forEach((q, i) => {
       const ans = userAnswers[i];
       if (!ans) hasBlank = true;
       const tr = document.createElement('tr');
       tr.innerHTML = `
         <td><strong>${q.num}</strong> &nbsp; ${q.text}</td>
-        <td style="color:${ans ? '#222' : '#c00'}; font-weight:${ans ? '400' : '700'}">${ans || '⚠ Empty'}</td>
+        <td style="color:${ans ? '#222' : '#c00'}; font-weight:${ans ? '400' : '700'}">
+          ${ans || '\u26a0 Empty'}
+        </td>
       `;
       tr.style.cursor = 'pointer';
       tr.title = 'Click to edit';
       tr.addEventListener('click', () => { showQuiz(); goTo(i); });
       tbody.appendChild(tr);
     });
+
     document.getElementById('blank-warning').style.display = hasBlank ? 'block' : 'none';
     document.getElementById('btn-submit').disabled = hasBlank;
   }
@@ -324,13 +478,15 @@
     document.getElementById('popup-confirm').classList.add('active');
   }
 
-  function closePopup(id) { document.getElementById(id).classList.remove('active'); }
+  function closePopup(id) {
+    document.getElementById(id).classList.remove('active');
+  }
 
   async function submitTest() {
     const { name, email } = getDetails();
     const btn = document.getElementById('btn-confirm-submit');
     btn.disabled = true;
-    btn.innerHTML = '<span class="spinner"></span>Submitting…';
+    btn.innerHTML = '<span class="spinner"></span>Submitting\u2026';
 
     const totalMarks  = questions.reduce((s, q) => s + q.points, 0);
     let   earnedMarks = 0;
@@ -340,40 +496,55 @@
       const correct = isCorrect(userAnswers[i], q.answers);
       const pts     = correct ? q.points : 0;
       earnedMarks  += pts;
-      answerDetails.push({ question: q.num, text: q.text, userAnswer: userAnswers[i], correct, points: pts, maxPoints: q.points, category: q.cat });
+      answerDetails.push({
+        question  : q.num,
+        text      : q.text,
+        userAnswer: userAnswers[i],
+        correct,
+        points    : pts,
+        maxPoints : q.points,
+        category  : q.cat,
+      });
     });
 
-    const payload = {
-      testType    : 'module',
-      module      : 'Module 19 — Percentages',
-      moduleNumber: 19,
-      sheetTab    : 'Percentages',
-      name, email,
-      date        : new Date().toLocaleDateString('en-GB'),
-      score       : earnedMarks,
-      total       : totalMarks,
-      answers     : answerDetails,
-    };
-
+    const client = getClient();
+    if (!client) {
+      btn.disabled = false;
+      btn.textContent = 'Yes, submit';
+      alert('Could not reach the server to submit your test. Please check your internet connection and try again.');
+      return;
+    }
     try {
-      await fetch(APPS_SCRIPT_URL, {
-        method : 'POST',
-        mode   : 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
-        body   : JSON.stringify(payload),
+      const { data, error } = await client.rpc('submit_attempt', {
+        p_test_slug: TEST_SLUG, p_email: email,
+        p_score: earnedMarks, p_max_score: totalMarks,
+        p_time_taken_seconds: null, p_answers: answerDetails,
       });
-    } catch (err) { console.warn('Submission error:', err); }
+      if (error || !data || data.success !== true) {
+        console.warn('Submission rejected:', error || data);
+        closePopup('popup-confirm');
+        showScreen('locked-screen');
+        return;
+      }
+    } catch (err) {
+      console.warn('Submission error:', err);
+      btn.disabled = false;
+      btn.textContent = 'Yes, submit';
+      alert('Could not submit right now \u2014 please check your connection and try again.');
+      return;
+    }
 
-    localStorage.setItem(LOCK_KEY, '1');
     closePopup('popup-confirm');
     showResult(name, earnedMarks, totalMarks, answerDetails);
   }
+
+  let incorrectQuestions = [];
 
   function showResult(name, earned, total, details) {
     showScreen('result-screen');
     document.getElementById('result-name').textContent = name;
     document.getElementById('score-display').textContent = `${earned} / ${total}`;
-    document.getElementById('score-label').textContent = `${Math.round((earned / total) * 100)}% — well done for completing the test!`;
+    document.getElementById('score-label').textContent = `${Math.round((earned / total) * 100)}% \u2014 well done for completing the test!`;
 
     const tbody = document.getElementById('results-body');
     tbody.innerHTML = '';
@@ -382,11 +553,78 @@
       tr.innerHTML = `
         <td><strong>${d.question}</strong> &nbsp; ${d.text}</td>
         <td>${d.userAnswer}</td>
-        <td>${d.correct ? '<span class="tick">✓</span>' : '<span class="cross">✗</span>'}</td>
+        <td>${d.correct ? '<span class="tick">\u2713</span>' : '<span class="cross">\u2717</span>'}</td>
       `;
       tbody.appendChild(tr);
     });
+
+    incorrectQuestions = details.filter(d => !d.correct);
+    retryAttemptsUsed = incorrectQuestions.map(() => 0);
+    const reviewBtn = document.getElementById('btn-review-incorrect');
+    reviewBtn.style.display = incorrectQuestions.length > 0 ? 'inline-block' : 'none';
   }
+
+  function showReviewIncorrect() {
+    showScreen('review-incorrect-screen');
+    const area = document.getElementById('incorrect-questions-area');
+    area.innerHTML = '';
+
+    incorrectQuestions.forEach((d, i) => {
+      const q = questions.find(q => q.num === d.question);
+      const card = document.createElement('div');
+      card.className = 'incorrect-question-card';
+      card.innerHTML = `
+        <div class="incorrect-q-meta">${d.question} &nbsp;\u00b7&nbsp; ${d.category}</div>
+        <div class="incorrect-q-text">${d.text}</div>
+        <p class="your-answer-note">Your answer: <strong>${d.userAnswer}</strong></p>
+        <input class="retry-input" type="text" id="retry-${i}" placeholder="Try again" autocomplete="off" autocorrect="off" spellcheck="false" />
+        <div class="retry-feedback" id="feedback-${i}"></div>
+        <button class="btn btn-check" id="check-${i}" onclick="checkRetry(${i})">Check answer</button>
+      `;
+      area.appendChild(card);
+      card.querySelector(`#retry-${i}`).addEventListener('keydown', e => {
+        if (e.key === 'Enter') checkRetry(i);
+      });
+    });
+  }
+
+  function checkRetry(i) {
+    const input    = document.getElementById(`retry-${i}`);
+    const feedback = document.getElementById(`feedback-${i}`);
+    const checkBtn = document.getElementById(`check-${i}`);
+    const q        = questions.find(q => q.num === incorrectQuestions[i].question);
+    const val      = input.value.trim();
+    if (!val || retryAttemptsUsed[i] >= MAX_RETRY_ATTEMPTS) return;
+
+    retryAttemptsUsed[i]++;
+    const remaining = MAX_RETRY_ATTEMPTS - retryAttemptsUsed[i];
+
+    if (isCorrect(val, q.answers)) {
+      feedback.textContent = '\u2713 Correct!';
+      feedback.className = 'retry-feedback correct';
+      input.disabled = true;
+      checkBtn.disabled = true;
+    } else if (remaining > 0) {
+      feedback.textContent = `\u2717 Not quite \u2014 have another go (${remaining} attempt${remaining > 1 ? 's' : ''} left).`;
+      feedback.className = 'retry-feedback incorrect';
+    } else {
+      feedback.textContent = '\u2717 No more tries on this one \u2014 head back to the video and come back later.';
+      feedback.className = 'retry-feedback exhausted';
+      input.disabled = true;
+      checkBtn.disabled = true;
+    }
+  }
+
+  function finishAndClose() {
+    try { window.close(); } catch(e) {}
+    document.body.innerHTML = `
+      <div style="font-family:'DM Sans',sans-serif; text-align:center; padding:60px 24px; color:#0D0D0D;">
+        <h2 style="font-family:'Fraunces',serif; color:#0D0080; margin-bottom:12px;">All done!</h2>
+        <p style="color:#4A4A4A;">You can now close this tab and return to your course.</p>
+      </div>
+    `;
+  }
+
 </script>
 </body>
 </html>
