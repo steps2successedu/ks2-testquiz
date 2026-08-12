@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Steps 2 Success — Assessments</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,600;0,700;1,700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: #F4F5FB;
+    color: #0D0D0D;
+    min-height: 100vh;
+  }
+
+  header {
+    background: #0D0080;
+    color: white;
+    padding: 18px 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  header img { height: 48px; }
+  header h1  { font-family: 'Fraunces', serif; font-size: 1.3rem; font-weight: 700; }
+  header p   { font-size: 0.85rem; color: #5EDDE0; margin-top: 2px; }
+
+  .container { max-width: 760px; margin: 0 auto; padding: 32px 16px 60px; }
+
+  /* ---- Login card ---- */
+  .login-card {
+    max-width: 420px;
+    margin: 40px auto;
+    background: white;
+    border-radius: 12px;
+    padding: 32px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+  .login-card h2 { font-family: 'Fraunces', serif; color: #0D0080; margin-bottom: 8px; font-size: 1.3rem; }
+  .login-card .sub { color: #4A4A4A; font-size: 0.9rem; margin-bottom: 22px; line-height: 1.5; }
+  .field { margin-bottom: 16px; }
+  .field label {
+    display: block; font-size: 0.8rem; font-weight: 700; color: #0D0080;
+    text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 6px;
+  }
+  .field input {
+    width: 100%; padding: 11px 14px; border: 2px solid #4A4A4A;
+    border-radius: 6px; font-size: 1rem; font-family: inherit;
+  }
+  .field input:focus { outline: none; border-color: #5EDDE0; }
+  .btn-gold {
+    width: 100%; padding: 13px; background: #E8B800; color: #0D0D0D;
+    border: none; border-radius: 6px; font-weight: 700; font-size: 1rem;
+    cursor: pointer; margin-top: 6px;
+  }
+  .btn-gold:hover { background: #C49A00; }
+  .btn-gold:disabled { opacity: 0.5; cursor: not-allowed; }
+  .form-error {
+    background: #FCE9E8; color: #B23B3A; padding: 10px 14px;
+    border-radius: 6px; margin-bottom: 16px; font-size: 0.85rem; display: none;
+  }
+
+  /* ---- Test list ---- */
+  #list-view { display: none; }
+  .whoami {
+    display: flex; justify-content: space-between; align-items: center;
+    background: white; border-radius: 10px; padding: 14px 20px; margin-bottom: 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08); flex-wrap: wrap; gap: 10px;
+  }
+  .whoami .name { font-weight: 700; color: #0D0080; }
+  .whoami .email { color: #4A4A4A; font-size: 0.85rem; }
+  .whoami a {
+    color: #0D0080; font-size: 0.85rem; text-decoration: underline; cursor: pointer;
+  }
+
+  .card {
+    background: white; border-radius: 10px; padding: 20px 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 18px;
+  }
+  .card h2 { font-family: 'Fraunces', serif; color: #0D0080; font-size: 1.1rem; margin-bottom: 4px; }
+  .card .sub { color: #4A4A4A; font-size: 0.85rem; margin-bottom: 14px; }
+  .link-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; }
+  .link-btn {
+    display: block; padding: 12px 16px; border-radius: 8px; background: #E0F9FA;
+    color: #0D0080; text-decoration: none; font-weight: 700; font-size: 0.9rem;
+    border-left: 4px solid #2AB8BC;
+  }
+  .link-btn:hover { background: #5EDDE0; }
+  .link-btn .n {
+    display: block; font-size: 0.72rem; color: #2AB8BC; text-transform: uppercase;
+    letter-spacing: 0.05em; font-weight: 700; margin-bottom: 2px;
+  }
+  .empty { color: #4A4A4A; font-style: italic; }
+</style>
+</head>
+<body>
+
+<header>
+  <img src="logo_official.png" alt="Steps 2 Success" />
+  <div>
+    <h1>Steps 2 Success</h1>
+    <p>Assessments</p>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- LOGIN VIEW -->
+  <div id="login-view">
+    <div class="login-card">
+      <h2>Let's get started</h2>
+      <p class="sub">Enter your name and email once — you won't need to type them again for the rest of this visit. If you've started a test before, coming back here and continuing will pick up right where you left off.</p>
+      <div class="form-error" id="form-error">Please enter your full name and a valid email address.</div>
+      <form id="login-form">
+        <div class="field">
+          <label for="in-name">Full name</label>
+          <input type="text" id="in-name" placeholder="e.g. Alex Smith" autocomplete="name" required />
+        </div>
+        <div class="field">
+          <label for="in-email">Email address</label>
+          <input type="email" id="in-email" placeholder="e.g. alex@email.com" autocomplete="email" required />
+        </div>
+        <button type="submit" class="btn-gold">Continue to tests</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- LIST VIEW -->
+  <div id="list-view">
+    <div class="whoami">
+      <div>
+        <div class="name" id="whoami-name"></div>
+        <div class="email" id="whoami-email"></div>
+      </div>
+      <a id="logout-link">Not you? Log out</a>
+    </div>
+
+    <div class="card">
+      <h2>Module Tests</h2>
+      <div class="sub">Complete these in any order, whenever you're ready.</div>
+      <div class="link-grid" id="module-links"></div>
+    </div>
+
+    <div class="card">
+      <h2>Course Tests</h2>
+      <p class="empty">Coming soon.</p>
+    </div>
+
+    <div class="card">
+      <h2>Full Practice Tests</h2>
+      <p class="empty">Coming soon.</p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const MODULES = [
+    [1, 'module1-addition', 'Addition'],
+    [2, 'module2-subtraction', 'Subtraction & Inverse'],
+    [3, 'module3-multiplication-facts-1', 'Multiplication Facts 1'],
+    [4, 'module4-multiplication-facts-2', 'Multiplication Facts 2'],
+    [5, 'module5-short-multiplication', 'Short Multiplication'],
+    [6, 'module6-long-multiplication', 'Long Multiplication'],
+    [7, 'module7-multiply-divide-10-100-1000', 'Multiply & Divide by 10/100/1000'],
+    [8, 'module8-division-facts-mental-methods', 'Division Facts & Mental Methods'],
+    [9, 'module9-short-division-one-digit', 'Short Division by One Digit'],
+    [10, 'module10-short-division-two-digits', 'Short Division by Two Digits'],
+    [11, 'module11-order-of-operations', 'Order of Operations'],
+    [12, 'module12-adding-subtracting-fractions', 'Adding & Subtracting Fractions'],
+    [13, 'module13-adding-mixed-numbers', 'Adding Mixed Numbers'],
+    [14, 'module14-subtracting-mixed-numbers', 'Subtracting from Mixed Numbers'],
+    [15, 'module15-multiplying-fractions', 'Multiplying Fractions'],
+    [16, 'module16-dividing-fractions', 'Dividing Fractions'],
+    [17, 'module17-adding-subtracting-decimals', 'Adding & Subtracting Decimals'],
+    [18, 'module18-multiplying-decimals', 'Multiplying Decimals'],
+    [19, 'module19-percentages', 'Percentages'],
+  ];
+
+  function renderModuleLinks() {
+    const grid = document.getElementById('module-links');
+    grid.innerHTML = MODULES.map(([n, slug, title]) => `
+      <a class="link-btn" href="${slug}.html">
+        <span class="n">Module ${n}</span>${title}
+      </a>
+    `).join('');
+  }
+
+  function showList(student) {
+    document.getElementById('login-view').style.display = 'none';
+    document.getElementById('list-view').style.display = 'block';
+    document.getElementById('whoami-name').textContent = student.name;
+    document.getElementById('whoami-email').textContent = student.email;
+    renderModuleLinks();
+  }
+
+  function showLogin() {
+    document.getElementById('list-view').style.display = 'none';
+    document.getElementById('login-view').style.display = 'block';
+  }
+
+  document.getElementById('login-form').addEventListener('submit', e => {
+    e.preventDefault();
+    const name = document.getElementById('in-name').value.trim();
+    const email = document.getElementById('in-email').value.trim();
+    const err = document.getElementById('form-error');
+    if (!name || !email || !email.includes('@')) {
+      err.style.display = 'block';
+      return;
+    }
+    err.style.display = 'none';
+    const student = { name, email };
+    sessionStorage.setItem('s2s_student', JSON.stringify(student));
+    showList(student);
+  });
+
+  document.getElementById('logout-link').addEventListener('click', () => {
+    sessionStorage.removeItem('s2s_student');
+    document.getElementById('in-name').value = '';
+    document.getElementById('in-email').value = '';
+    showLogin();
+  });
+
+  // If they've already entered their details earlier in this visit
+  // (e.g. navigating back from a test), skip straight to the list.
+  (function init() {
+    try {
+      const saved = JSON.parse(sessionStorage.getItem('s2s_student') || 'null');
+      if (saved && saved.name && saved.email) {
+        showList(saved);
+        return;
+      }
+    } catch (e) { /* ignore malformed storage */ }
+    showLogin();
+  })();
+</script>
+
+</body>
+</html>

@@ -93,6 +93,7 @@
     .spinner { display: inline-block; width: 20px; height: 20px; border: 3px solid rgba(0,0,0,0.2); border-top-color: #0D0D0D; border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 8px; }
     @keyframes spin { to { transform: rotate(360deg); } }
   
+    .details-bar input[readonly] { background:#E0F9FA; border-color:#5EDDE0; cursor:default; }
     .finish-bar { display:flex; gap:12px; flex-wrap:wrap; margin-top:20px; }
     #review-incorrect-screen { display:none; }
     .review-incorrect-header {
@@ -284,9 +285,56 @@
   let retryAttemptsUsed = [];   // per incorrect-question retry counter
 
   window.addEventListener('DOMContentLoaded', () => {
+    prefillFromPortal();
     showScreen('quiz-screen');
     renderQuestion();
   });
+
+  // If the student arrived here from the Steps 2 Success test list (start.html),
+  // their name/email are carried over via sessionStorage for this browser tab only
+  // -- nothing is written to disk or remembered across visits. This just saves
+  // re-typing the same details on every test; the actual resume/lock behaviour is
+  // still entirely driven by Supabase, keyed on name+email, exactly as before.
+  function prefillFromPortal() {
+    let saved;
+    try { saved = JSON.parse(sessionStorage.getItem('s2s_student') || 'null'); }
+    catch (e) { saved = null; }
+    if (!saved || !saved.name || !saved.email) return;
+    const nameEl  = document.getElementById('student-name');
+    const emailEl = document.getElementById('student-email');
+    if (!nameEl || !emailEl) return;
+    nameEl.value = saved.name;
+    emailEl.value = saved.email;
+    nameEl.readOnly = true;
+    emailEl.readOnly = true;
+    onDetailsInput();
+    injectNotYouLink();
+  }
+
+  function injectNotYouLink() {
+    const bar = document.querySelector('.details-bar');
+    if (!bar || document.getElementById('not-you-link')) return;
+    const link = document.createElement('a');
+    link.id = 'not-you-link';
+    link.href = '#';
+    link.textContent = 'Not you? Clear and re-enter your details';
+    link.style.cssText = 'flex-basis:100%;font-size:0.82rem;color:#0D0080;margin-top:4px;text-decoration:underline;cursor:pointer;';
+    link.addEventListener('click', e => {
+      e.preventDefault();
+      sessionStorage.removeItem('s2s_student');
+      const nameEl  = document.getElementById('student-name');
+      const emailEl = document.getElementById('student-email');
+      nameEl.readOnly = false;
+      emailEl.readOnly = false;
+      nameEl.value = '';
+      emailEl.value = '';
+      nameEl.classList.remove('filled');
+      emailEl.classList.remove('filled');
+      link.remove();
+      nameEl.focus();
+    });
+    bar.appendChild(link);
+  }
 
   window.addEventListener('beforeunload', e => {
     const inProgress = document.getElementById('quiz-screen').style.display !== 'none'
