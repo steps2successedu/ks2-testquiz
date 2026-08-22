@@ -471,6 +471,91 @@
   .test-card.resume .arrow { color: var(--amber); }
   .status.resume { background: var(--amber); color: #3D2800; }
 
+  /* ---- Course tabs ---- */
+  .tabbar {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 6px;
+    margin-bottom: 22px;
+    scrollbar-width: thin;
+    -webkit-overflow-scrolling: touch;
+  }
+  .tab-btn {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 17px;
+    border-radius: 99px;
+    border: 1.5px solid var(--line-strong);
+    background: var(--white);
+    color: var(--ink-soft);
+    font-family: inherit;
+    font-weight: 700;
+    font-size: 0.86rem;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.16s var(--ease), border-color 0.16s var(--ease), color 0.16s var(--ease);
+  }
+  .tab-btn .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--tab-accent, var(--cyan-mid));
+    flex: 0 0 auto;
+  }
+  .tab-btn:hover { border-color: var(--tab-accent, var(--line-strong)); background: var(--page); }
+  .tab-btn.active {
+    background: var(--tab-accent, var(--royal-deep));
+    border-color: var(--tab-accent, var(--royal-deep));
+    color: var(--white);
+  }
+  .tab-btn.active .dot { background: var(--white); }
+
+  /* ---- Sub-sections within a course (module / course test / practice) ---- */
+  .course-body { padding: 18px 24px 24px; }
+  .section-group { margin-bottom: 24px; }
+  .section-group:last-child { margin-bottom: 0; }
+  .section-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 11px;
+  }
+  .section-label .txt {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    white-space: nowrap;
+  }
+  .section-label .hint {
+    font-size: 0.72rem;
+    color: var(--ink-soft);
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: normal;
+    white-space: nowrap;
+  }
+  .section-label .rule { flex: 1 1 auto; height: 1px; background: var(--line); }
+
+  /* Course test: one prominent, full-width card */
+  .test-card.feature {
+    padding: 20px 46px 20px 22px;
+    border-left-width: 5px;
+  }
+  .test-card.feature .t { font-size: 1.08rem; }
+  .test-card.feature .n { color: var(--accent-text, var(--cyan-mid)); }
+
+  /* Practice: one full-width card, visually "lighter weight" than a real test */
+  .test-card.practice {
+    border-style: dashed;
+    background: var(--page);
+    padding: 16px 46px 16px 20px;
+  }
+  .test-card.practice:hover { background: var(--accent-soft, var(--cyan-tint)); }
+
   /* ---- Progress summary ---- */
   .summary {
     display: flex;
@@ -619,6 +704,8 @@
       <span class="bar"><span id="summary-bar"></span></span>
     </div>
 
+    <div class="tabbar" id="tabbar" role="tablist" aria-label="Choose a topic"></div>
+
     <div id="course-sections"></div>
 
     <div class="page-foot">Steps 2 Success Education</div>
@@ -702,61 +789,108 @@
     return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
   }
 
-  function renderCourses() {
-    const wrap = document.getElementById('course-sections');
+  let activeCourseIndex = 0;
+  let progressMap = null;
 
-    const live = COURSES.map(c => {
-      const moduleCards = c.tests.map(([n, slug, title, qs, marks]) => {
-        const marksNote = marks === qs ? `${qs} questions` : `${qs} questions &middot; ${marks} marks`;
-        return `<a class="test-card" data-slug="${esc(slug)}" href="${esc(slug)}.html">
-            <span class="n">Module ${n}</span>
-            <span class="t">${esc(title)}</span>
-            <span class="q">${marksNote}</span>
-            ${ARROW}
-          </a>`;
-      }).join('');
+  function renderTabs() {
+    const bar = document.getElementById('tabbar');
+    bar.innerHTML = COURSES.map((c, i) => `
+        <button type="button" class="tab-btn ${i === activeCourseIndex ? 'active' : ''}"
+                data-idx="${i}" style="--tab-accent:${c.accent}"
+                role="tab" aria-selected="${i === activeCourseIndex}">
+          <span class="dot"></span>${esc(c.name)}
+        </button>`).join('');
 
-      let courseTestCard = '';
-      if (c.courseTest) {
-        const [slug, title, qs, marks] = c.courseTest;
-        const marksNote = marks === qs ? `${qs} questions &middot; 40 min` : `${qs} questions &middot; ${marks} marks &middot; 40 min`;
-        courseTestCard = `<a class="test-card" data-slug="${esc(slug)}" href="${esc(slug)}.html">
-            <span class="n">Course Test</span>
-            <span class="t">${esc(title)}</span>
-            <span class="q">${marksNote}</span>
-            ${ARROW}
-          </a>`;
-      }
+    bar.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        activeCourseIndex = parseInt(btn.dataset.idx, 10);
+        renderTabs();
+        renderActivePanel();
+        decoratePanel(progressMap);
+      });
+    });
+  }
 
-      let practiceTestCard = '';
-      if (c.practiceTest) {
-        const [slug, title] = c.practiceTest;
-        practiceTestCard = `<a class="test-card" href="${esc(slug)}.html">
-            <span class="n">Practice</span>
-            <span class="t">${esc(title)}</span>
-            <span class="q">Unlimited &middot; nothing saved</span>
-            ${ARROW}
-          </a>`;
-      }
-
-      const totalQs = c.tests.reduce((a, t) => a + t[3], 0);
-      const cardCount = c.tests.length + (c.courseTest ? 1 : 0) + (c.practiceTest ? 1 : 0);
-      const label = cardCount === 1 ? '1 test' : `${cardCount} tests`;
-
-      return `<section class="course" style="--accent:${c.accent};--accent-soft:${c.soft};--accent-text:${c.text}">
-          <div class="course-head">
-            <span class="course-dot"></span>
-            <div class="course-head-text">
-              <h3>${esc(c.name)}</h3>
-              <div class="meta">${totalQs} module questions, plus a course test and practice</div>
-            </div>
-            <span class="course-count">${label}</span>
-          </div>
-          <div class="test-grid">${moduleCards}${courseTestCard}${practiceTestCard}</div>
-        </section>`;
+  function courseSectionHTML(c) {
+    const moduleCards = c.tests.map(([n, slug, title, qs, marks]) => {
+      const marksNote = marks === qs ? `${qs} questions` : `${qs} questions &middot; ${marks} marks`;
+      return `<a class="test-card" data-slug="${esc(slug)}" href="${esc(slug)}.html">
+          <span class="n">Module ${n}</span>
+          <span class="t">${esc(title)}</span>
+          <span class="q">${marksNote}</span>
+          ${ARROW}
+        </a>`;
     }).join('');
 
-    wrap.innerHTML = live;
+    let courseTestCard = '';
+    if (c.courseTest) {
+      const [slug, title, qs, marks] = c.courseTest;
+      const marksNote = marks === qs
+        ? `${qs} questions &middot; 40 min &middot; certificate on pass`
+        : `${qs} questions &middot; ${marks} marks &middot; 40 min &middot; certificate on pass`;
+      courseTestCard = `<a class="test-card feature" data-slug="${esc(slug)}" href="${esc(slug)}.html">
+          <span class="n">Course Test</span>
+          <span class="t">${esc(title)}</span>
+          <span class="q">${marksNote}</span>
+          ${ARROW}
+        </a>`;
+    }
+
+    let practiceTestCard = '';
+    if (c.practiceTest) {
+      const [slug, title] = c.practiceTest;
+      practiceTestCard = `<a class="test-card practice" href="${esc(slug)}.html">
+          <span class="n">Practice</span>
+          <span class="t">${esc(title)}</span>
+          <span class="q">Unlimited attempts &middot; nothing saved</span>
+          ${ARROW}
+        </a>`;
+    }
+
+    const totalQs = c.tests.reduce((a, t) => a + t[3], 0);
+    const cardCount = c.tests.length + (c.courseTest ? 1 : 0) + (c.practiceTest ? 1 : 0);
+    const label = cardCount === 1 ? '1 test' : `${cardCount} tests`;
+
+    return `<section class="course" style="--accent:${c.accent};--accent-soft:${c.soft};--accent-text:${c.text}">
+        <div class="course-head">
+          <span class="course-dot"></span>
+          <div class="course-head-text">
+            <h3>${esc(c.name)}</h3>
+            <div class="meta">${totalQs} module questions, plus a course test and practice</div>
+          </div>
+          <span class="course-count">${label}</span>
+        </div>
+        <div class="course-body">
+          <div class="section-group">
+            <div class="section-label">
+              <span class="txt">Module tests</span>
+              <span class="rule"></span>
+              <span class="hint">${c.tests.length} in this topic</span>
+            </div>
+            <div class="test-grid">${moduleCards}</div>
+          </div>
+          ${c.courseTest ? `<div class="section-group">
+            <div class="section-label">
+              <span class="txt">Course test</span>
+              <span class="rule"></span>
+              <span class="hint">Sit once every module is done</span>
+            </div>
+            ${courseTestCard}
+          </div>` : ''}
+          ${c.practiceTest ? `<div class="section-group">
+            <div class="section-label">
+              <span class="txt">Practice</span>
+              <span class="rule"></span>
+              <span class="hint">Warm up before the course test</span>
+            </div>
+            ${practiceTestCard}
+          </div>` : ''}
+        </div>
+      </section>`;
+  }
+
+  function renderActivePanel() {
+    document.getElementById('course-sections').innerHTML = courseSectionHTML(COURSES[activeCourseIndex]);
   }
 
   /* ---------------------------------------------------------
@@ -794,19 +928,39 @@
     }
   }
 
-  function applyProgress(map) {
+  /* Summary counts across ALL courses regardless of which tab is open,
+     so it is computed straight from the data model rather than the DOM. */
+  function computeSummary(map) {
     if (!map) return;
     let done = 0, total = 0;
+    COURSES.forEach(c => {
+      c.tests.forEach(([, slug]) => {
+        total++;
+        if (map[slug] === 'submitted') done++;
+      });
+      if (c.courseTest) {
+        total++;
+        if (map[c.courseTest[0]] === 'submitted') done++;
+      }
+    });
+    const box = document.getElementById('summary');
+    document.getElementById('summary-done').textContent = done;
+    document.getElementById('summary-total').textContent = total;
+    document.getElementById('summary-bar').style.width =
+      total ? (done / total * 100) + '%' : '0%';
+    box.classList.remove('hidden');
+  }
 
-    document.querySelectorAll('.test-card[data-slug]').forEach(card => {
-      total++;
+  /* Decorates only the cards currently on screen — called again on every tab switch. */
+  function decoratePanel(map) {
+    if (!map) return;
+    document.querySelectorAll('#course-sections .test-card[data-slug]').forEach(card => {
       const status = map[card.dataset.slug];
       card.classList.remove('done', 'resume');
       const old = card.querySelector('.status');
       if (old) old.remove();
 
       if (status === 'submitted') {
-        done++;
         card.classList.add('done');
         card.insertAdjacentHTML('beforeend',
           `<span class="status done">${TICK} Completed</span>`);
@@ -816,13 +970,6 @@
           `<span class="status resume">${CLOCK} Resume</span>`);
       }
     });
-
-    const box = document.getElementById('summary');
-    document.getElementById('summary-done').textContent = done;
-    document.getElementById('summary-total').textContent = total;
-    document.getElementById('summary-bar').style.width =
-      total ? (done / total * 100) + '%' : '0%';
-    box.classList.remove('hidden');
   }
 
   function showList(student) {
@@ -831,8 +978,13 @@
     document.getElementById('whoami-name').textContent = student.name;
     document.getElementById('whoami-email').textContent = student.email;
     document.getElementById('whoami-initials').textContent = initials(student.name);
-    renderCourses();
-    loadProgress(student.email).then(applyProgress);
+    renderTabs();
+    renderActivePanel();
+    loadProgress(student.email).then(map => {
+      progressMap = map;
+      computeSummary(map);
+      decoratePanel(map);
+    });
   }
 
   function showLogin() {
