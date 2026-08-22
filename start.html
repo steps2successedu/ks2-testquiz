@@ -861,9 +861,7 @@
     let courseTestCard = '';
     if (c.courseTest) {
       const [slug, title, qs, marks] = c.courseTest;
-      const marksNote = marks === qs
-        ? `${qs} questions &middot; 40 min &middot; certificate on pass`
-        : `${qs} questions &middot; ${marks} marks &middot; 40 min &middot; certificate on pass`;
+      const marksNote = marks === qs ? `${qs} questions` : `${qs} questions &middot; ${marks} marks`;
       courseTestCard = `<a class="test-card feature" data-slug="${esc(slug)}" href="${esc(slug)}.html">
           <span class="n">Course Test</span>
           <span class="t">${esc(title)}</span>
@@ -878,7 +876,7 @@
       practiceTestCard = `<a class="test-card practice" href="${esc(slug)}.html">
           <span class="n">Course Practice Test</span>
           <span class="t">${esc(title)}</span>
-          <span class="q">Unlimited attempts &middot; nothing saved</span>
+          <span class="q">Unlimited attempts</span>
           ${ARROW}
         </a>`;
     }
@@ -905,14 +903,6 @@
             </div>
             <div class="test-grid">${moduleCards}</div>
           </div>
-          ${c.courseTest ? `<div class="section-group">
-            <div class="section-label">
-              <span class="txt">Course test</span>
-              <span class="rule"></span>
-              <span class="hint">Sit once every module is done</span>
-            </div>
-            ${courseTestCard}
-          </div>` : ''}
           ${c.practiceTest ? `<div class="section-group">
             <div class="section-label">
               <span class="txt">Course Practice Test</span>
@@ -924,6 +914,14 @@
               ${INFO_ICON}
               <span><strong>Practice as many times as you want</strong> before you do the course test. Course tests can only be completed once!</span>
             </p>
+          </div>` : ''}
+          ${c.courseTest ? `<div class="section-group">
+            <div class="section-label">
+              <span class="txt">Course test</span>
+              <span class="rule"></span>
+              <span class="hint">Sit once every module is done</span>
+            </div>
+            ${courseTestCard}
           </div>` : ''}
         </div>
       </section>`;
