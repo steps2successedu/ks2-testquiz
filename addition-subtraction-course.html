@@ -267,7 +267,7 @@
     .tick  { color: #27C47A; font-size: 1.2rem; font-weight: 700; }
     .cross { color: #E24B4A; font-size: 1.2rem; font-weight: 700; }
 
-    #locked-screen {
+    #locked-screen, #modules-incomplete-screen {
       display: none;
       background: white;
       border-radius: 10px;
@@ -275,9 +275,20 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.08);
       text-align: center;
     }
-    #locked-screen h2 { font-family: 'Fraunces', serif; color: #0D0080; margin-bottom: 12px; }
-    #locked-screen p  { color: #4A4A4A; font-size: 0.95rem; line-height: 1.6; }
+    #locked-screen h2, #modules-incomplete-screen h2 { font-family: 'Fraunces', serif; color: #0D0080; margin-bottom: 12px; }
+    #locked-screen p, #modules-incomplete-screen p  { color: #4A4A4A; font-size: 0.95rem; line-height: 1.6; }
     .lock-icon { font-size: 3rem; margin-bottom: 16px; }
+    #modules-incomplete-screen .btn-outline {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 11px 26px;
+      border: 2px solid #0D0080;
+      border-radius: 6px;
+      color: #0D0080;
+      font-weight: 700;
+      font-size: 0.95rem;
+      text-decoration: none;
+    }
 
     .overlay {
       display: none;
@@ -355,6 +366,14 @@
     <div class="lock-icon">🔒</div>
     <h2>Test already submitted</h2>
     <p>This test has already been completed and cannot be taken again.<br>Please speak to your teacher if you think this is a mistake.</p>
+  </div>
+
+  <div id="modules-incomplete-screen">
+    <div class="lock-icon">📚</div>
+    <h2>Finish the module tests first</h2>
+    <p>The course test unlocks once every module in this topic has been completed.<br>
+       You still have <strong id="incomplete-count">some module tests</strong> left to finish &mdash; the course practice test is open any time in the meantime.</p>
+    <a class="btn-outline" href="start.html">Back to your tests</a>
   </div>
 
   <div id="quiz-screen">
@@ -644,6 +663,11 @@
       if (error) { console.warn('status check error', error); return; }
       if (data.status === 'locked') {
         showScreen('locked-screen');
+      } else if (data.status === 'modules_incomplete') {
+        const n = data.incomplete_count || 0;
+        const el = document.getElementById('incomplete-count');
+        if (el) el.textContent = n === 1 ? '1 module test' : `${n} module tests`;
+        showScreen('modules-incomplete-screen');
       } else if (data.status === 'resumed') {
         attemptStarted = true;
         userAnswers = (data.answers || []).length ? data.answers.map(a => a.userAnswer || '') : userAnswers;
@@ -673,7 +697,7 @@
   }
 
   function showScreen(id) {
-    ['locked-screen','quiz-screen','review-screen','result-screen']
+    ['locked-screen','modules-incomplete-screen','quiz-screen','review-screen','result-screen']
       .forEach(s => document.getElementById(s).style.display = 'none');
     document.getElementById(id).style.display = 'block';
   }

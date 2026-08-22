@@ -471,6 +471,24 @@
   .test-card.resume .arrow { color: var(--amber); }
   .status.resume { background: var(--amber); color: #3D2800; }
 
+  /* Locked — course test not yet available (modules not all complete) */
+  .test-card.locked {
+    cursor: default;
+    background: #F3F4F9;
+    border-color: var(--line);
+    border-left-color: var(--line-strong);
+    opacity: 0.85;
+  }
+  .test-card.locked:hover {
+    transform: none;
+    box-shadow: none;
+    background: #F3F4F9;
+    border-color: var(--line);
+    border-left-color: var(--line-strong);
+  }
+  .test-card.locked .n { color: var(--ink-soft); }
+  .status.locked { background: var(--line-strong); color: var(--ink-soft); }
+
   /* ---- Course tabs ---- */
   .tabbar {
     display: flex;
@@ -555,6 +573,23 @@
     padding: 16px 46px 16px 20px;
   }
   .test-card.practice:hover { background: var(--accent-soft, var(--cyan-tint)); }
+
+  .practice-note {
+    display: flex;
+    gap: 9px;
+    align-items: flex-start;
+    margin-top: 10px;
+    padding: 10px 14px;
+    background: var(--gold-tint);
+    border: 1px solid #F0DE8A;
+    border-left: 4px solid var(--gold);
+    border-radius: 0 var(--r-sm) var(--r-sm) 0;
+    font-size: 0.83rem;
+    color: #6B5400;
+    line-height: 1.5;
+  }
+  .practice-note svg { flex: 0 0 auto; margin-top: 1px; color: var(--gold-deep); }
+  .practice-note strong { color: #4A3A00; }
 
   /* ---- Progress summary ---- */
   .summary {
@@ -729,7 +764,7 @@
         [2, 'module2-subtraction', 'Subtraction & Inverse', 12, 12],
       ],
       courseTest: ['addition-subtraction-course', 'Addition & Subtraction — Course Test', 20, 20],
-      practiceTest: ['addition-subtraction-practice', 'Addition & Subtraction — Practice'],
+      practiceTest: ['addition-subtraction-practice', 'Addition & Subtraction — Course Practice Test'],
     },
     {
       name: 'Multiplication & Division',
@@ -746,7 +781,7 @@
         [11, 'module11-order-of-operations', 'Order of Operations', 6, 6],
       ],
       courseTest: ['multiplication-division-course', 'Multiplication & Division — Course Test', 20, 24],
-      practiceTest: ['multiplication-division-practice', 'Multiplication & Division — Practice'],
+      practiceTest: ['multiplication-division-practice', 'Multiplication & Division — Course Practice Test'],
     },
     {
       name: 'Fractions',
@@ -759,7 +794,7 @@
         [16, 'module16-dividing-fractions', 'Dividing Fractions', 6, 6],
       ],
       courseTest: ['fractions-course', 'Fractions — Course Test', 20, 20],
-      practiceTest: ['fractions-practice', 'Fractions — Practice'],
+      practiceTest: ['fractions-practice', 'Fractions — Course Practice Test'],
     },
     {
       name: 'Decimals & Percentages',
@@ -770,11 +805,12 @@
         [19, 'module19-percentages', 'Percentages', 6, 6],
       ],
       courseTest: ['decimals-percentages-course', 'Decimals & Percentages — Course Test', 20, 20],
-      practiceTest: ['decimals-percentages-practice', 'Decimals & Percentages — Practice'],
+      practiceTest: ['decimals-percentages-practice', 'Decimals & Percentages — Course Practice Test'],
     },
   ];
 
   const ARROW = '<svg class="arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>';
+  const INFO_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>';
 
   function esc(s) {
     return String(s).replace(/[&<>"']/g, c => (
@@ -840,7 +876,7 @@
     if (c.practiceTest) {
       const [slug, title] = c.practiceTest;
       practiceTestCard = `<a class="test-card practice" href="${esc(slug)}.html">
-          <span class="n">Practice</span>
+          <span class="n">Course Practice Test</span>
           <span class="t">${esc(title)}</span>
           <span class="q">Unlimited attempts &middot; nothing saved</span>
           ${ARROW}
@@ -856,7 +892,7 @@
           <span class="course-dot"></span>
           <div class="course-head-text">
             <h3>${esc(c.name)}</h3>
-            <div class="meta">${totalQs} module questions, plus a course test and practice</div>
+            <div class="meta">${totalQs} module questions, plus a course test and a course practice test</div>
           </div>
           <span class="course-count">${label}</span>
         </div>
@@ -879,11 +915,15 @@
           </div>` : ''}
           ${c.practiceTest ? `<div class="section-group">
             <div class="section-label">
-              <span class="txt">Practice</span>
+              <span class="txt">Course Practice Test</span>
               <span class="rule"></span>
               <span class="hint">Warm up before the course test</span>
             </div>
             ${practiceTestCard}
+            <p class="practice-note">
+              ${INFO_ICON}
+              <span><strong>Practice as many times as you want</strong> before you do the course test. Course tests can only be completed once!</span>
+            </p>
           </div>` : ''}
         </div>
       </section>`;
@@ -912,6 +952,7 @@
 
   const TICK = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>';
   const CLOCK = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>';
+  const LOCK = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M7 10V7a5 5 0 0 1 10 0v3"/></svg>';
 
   async function loadProgress(email) {
     const client = getClient();
@@ -970,6 +1011,29 @@
           `<span class="status resume">${CLOCK} Resume</span>`);
       }
     });
+
+    /* Course test lock: mirrors the server-side rule in start_or_resume_attempt
+       (a course test cannot be started until every module test in that course
+       has been submitted). This is a UX affordance only — the actual gate is
+       enforced in the database, so this can never be bypassed by editing the page. */
+    const course = COURSES[activeCourseIndex];
+    const featureCard = document.querySelector('#course-sections .test-card.feature');
+    if (course && course.courseTest && featureCard &&
+        !featureCard.classList.contains('done') && !featureCard.classList.contains('resume')) {
+      const total = course.tests.length;
+      const done = course.tests.filter(([, slug]) => map[slug] === 'submitted').length;
+      if (done < total) {
+        featureCard.classList.add('locked');
+        featureCard.removeAttribute('href');
+        featureCard.setAttribute('aria-disabled', 'true');
+        const arrow = featureCard.querySelector('.arrow');
+        if (arrow) arrow.remove();
+        const old = featureCard.querySelector('.status');
+        if (old) old.remove();
+        featureCard.insertAdjacentHTML('beforeend',
+          `<span class="status locked">${LOCK} ${done} of ${total} modules done</span>`);
+      }
+    }
   }
 
   function showList(student) {
