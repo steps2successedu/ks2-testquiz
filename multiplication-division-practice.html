@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Multiplication & Division — Practice | Steps 2 Success</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,600;0,700;1,700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Sans', sans-serif; background: #F4F5FB; color: #0D0D0D; min-height: 100vh; }
+    header { background: #0D0080; color: white; padding: 18px 24px; display: flex; align-items: center; gap: 16px; }
+    header img { height: 48px; }
+    header h1 { font-family: 'Fraunces', serif; font-size: 1.3rem; font-weight: 700; }
+    header p { font-size: 0.85rem; color: #5EDDE0; margin-top: 2px; }
+    .back-link { font-size: 0.83rem; font-weight: 500; color: #5EDDE0; text-decoration: none; margin-right: 8px; }
+    .back-link:hover { color: white; }
+    .container { max-width: 680px; margin: 32px auto; padding: 0 16px 60px; }
+    .card { background: white; border-radius: 10px; padding: 30px 28px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 20px; }
+    .card h2 { font-family: 'Fraunces', serif; color: #0D0080; font-size: 1.4rem; margin-bottom: 10px; }
+    .card p { color: #4A4A4A; font-size: 0.95rem; line-height: 1.55; margin-bottom: 10px; }
+    .attempts-note { font-size: 0.85rem; color: #7A6000; background: #FFF8CC; border: 1px solid #F0DE8A; border-radius: 6px; padding: 8px 12px; display: inline-block; margin-bottom: 14px; }
+    .btn { display: inline-block; padding: 11px 26px; border: none; border-radius: 6px; font-size: 1rem; font-weight: 700; cursor: pointer; transition: opacity 0.2s, transform 0.1s; text-decoration: none; }
+    .btn:active:not(:disabled) { transform: scale(0.97); }
+    .btn-primary { background: #E8B800; color: #0D0D0D; }
+    .btn-secondary { background: #5EDDE0; color: #0D0D0D; }
+    .btn-outline { background: white; color: #0D0080; border: 2px solid #0D0080; }
+    .btn:disabled { opacity: 0.35; cursor: not-allowed; }
+    #screen-start, #screen-question, #screen-end { display: none; }
+    .q-counter { font-size: 0.88rem; color: #4A4A4A; margin-bottom: 10px; }
+    .q-meta { font-size: 0.75rem; font-weight: 700; color: #1F9296; background: #E0F9FA; border: 1px solid #BCE9EA; border-radius: 99px; padding: 4px 12px; display: inline-block; margin-bottom: 14px; text-transform: uppercase; letter-spacing: 0.04em; }
+    .q-text { font-family: 'Fraunces', serif; font-size: 1.5rem; font-weight: 700; color: #0D0080; margin-bottom: 18px; }
+    .answer-input { width: 100%; max-width: 280px; padding: 10px 14px; border: 2px solid #4A4A4A; border-radius: 6px; font-size: 1.1rem; margin-bottom: 14px; }
+    .answer-input:focus { outline: none; border-color: #5EDDE0; }
+    .answer-input:disabled { background: #f0f0f0; }
+    .feedback { font-weight: 700; font-size: 1rem; margin-bottom: 14px; min-height: 1.4em; }
+    .feedback.correct { color: #27C47A; }
+    .feedback.incorrect { color: #E24B4A; }
+    .nav-row { display: flex; gap: 12px; flex-wrap: wrap; }
+    .score-big { font-family: 'Fraunces', serif; font-size: 2.6rem; font-weight: 800; color: #0D0080; margin: 10px 0; }
+    @media (max-width:620px) { .q-text { font-size: 1.2rem; } .answer-input { max-width: 100%; } }
+
+  </style>
+</head>
+<body>
+
+<header>
+  <a class="back-link" href="start.html">All tests</a>
+  <a class="home-link" href="start.html" aria-label="Back to all tests" title="Back to all tests"><img src="logo_cropped.png" alt="Steps 2 Success" /></a>
+  <div>
+    <h1>Multiplication & Division — Practice</h1>
+    <p>Unlimited practice &middot; nothing is saved</p>
+  </div>
+</header>
+
+<div class="container">
+
+  <div id="screen-start">
+    <div class="card">
+      <h2>Practice before the real test</h2>
+      <p>These questions regenerate with new numbers every time &mdash; practise as much as you like before taking the timed course test. Nothing here is saved or sent anywhere.</p>
+      <p id="attempts-note" class="attempts-note"></p>
+      <div class="nav-row">
+        <button class="btn btn-primary" id="btn-start" onclick="startPractice()">Start practice</button>
+        <a class="btn btn-outline" href="multiplication-division-course.html">Take the real course test</a>
+      </div>
+    </div>
+  </div>
+
+  <div id="screen-question">
+    <div class="card">
+      <p class="q-counter" id="q-counter"></p>
+      <span class="q-meta" id="q-meta"></span>
+      <div class="q-text" id="q-text"></div>
+      <input class="answer-input" type="text" id="answer-input" placeholder="Your answer" autocomplete="off" autocorrect="off" spellcheck="false" />
+      <div class="feedback" id="feedback"></div>
+      <div class="nav-row">
+        <button class="btn btn-primary" id="btn-check" onclick="checkAnswer()">Check answer</button>
+        <button class="btn btn-secondary" id="btn-nextq" onclick="nextQuestion()" style="display:none">Next →</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="screen-end">
+    <div class="card">
+      <h2>Practice complete!</h2>
+      <div class="score-big" id="end-score"></div>
+      <p id="end-message"></p>
+      <div class="nav-row">
+        <button class="btn btn-primary" id="btn-again" onclick="startPractice()">Practice again</button>
+        <a class="btn btn-outline" href="multiplication-division-course.html">Take the real course test</a>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+
+  function rand(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+  function fmt(n) { return n.toLocaleString('en-GB'); }
+  function normalise(s) { return String(s).trim().toLowerCase().replace(/,/g, '').replace(/\s+/g, ' '); }
+  function gcd(a, b) { a = Math.abs(a); b = Math.abs(b); while (b) { [a, b] = [b, a % b]; } return a || 1; }
+  function simplifyFrac(n, d) { const g = gcd(n, d); return [n / g, d / g]; }
+
+  // Parses a user-entered fraction answer: "a/b", "w a/b" (mixed), or a
+  // plain integer. Returns [numerator, denominator] as an EXACT fraction
+  // (not reduced), or null if unparseable.
+  function parseFracInput(str) {
+    str = str.trim();
+    let m = str.match(/^(-?\d+)\s+(\d+)\/(\d+)$/); // mixed: "w n/d"
+    if (m) {
+      const w = parseInt(m[1], 10), n = parseInt(m[2], 10), d = parseInt(m[3], 10);
+      const sign = w < 0 ? -1 : 1;
+      return [sign * (Math.abs(w) * d + n), d];
+    }
+    m = str.match(/^(-?\d+)\/(\d+)$/); // improper: "n/d"
+    if (m) return [parseInt(m[1], 10), parseInt(m[2], 10)];
+    m = str.match(/^-?\d+(\.\d+)?$/); // plain integer or decimal
+    if (m) {
+      const val = parseFloat(str);
+      if (Number.isInteger(val)) return [val, 1];
+      // decimal fallback (rare for fraction questions) -- convert to /1000ths
+      return [Math.round(val * 1000), 1000];
+    }
+    return null;
+  }
+
+  function checkFractionAnswer(userInput, trueN, trueD) {
+    const parsed = parseFracInput(userInput);
+    if (!parsed) return false;
+    const [un, ud] = parsed;
+    // cross-multiply for exact equivalence, no rounding
+    return un * trueD === trueN * ud;
+  }
+
+  function fracToString(n, d) {
+    const [rn, rd] = simplifyFrac(n, d);
+    if (rd === 1) return String(rn);
+    const whole = Math.trunc(rn / rd);
+    const rem = rn - whole * rd;
+    if (whole !== 0 && rem !== 0) return `${whole} ${Math.abs(rem)}/${rd}`;
+    if (rem === 0) return String(whole);
+    return `${rn}/${rd}`;
+  }
+
+  function checkPlainAnswer(userInput, correctValue) {
+    return normalise(userInput) === normalise(String(correctValue));
+  }
+
+  function checkDecimalAnswer(userInput, correctValue) {
+    const val = parseFloat(normalise(userInput));
+    if (Number.isNaN(val)) return false;
+    return Math.abs(val - correctValue) < 0.0005;
+  }
+
+  function checkRemainderAnswer(userInput, q, r, d) {
+    const s = normalise(userInput);
+    if (r === 0) return checkPlainAnswer(userInput, q);
+    if (s === `${q} r${r}` || s === `${q}r${r}`) return true;
+    let m = s.match(/^(\d+)\s*r\s*(\d+)$/);
+    if (m && parseInt(m[1], 10) === q && parseInt(m[2], 10) === r) return true;
+    m = s.match(/^(\d+)\s+(\d+)\/(\d+)$/);
+    if (m && parseInt(m[1], 10) === q) {
+      const un = parseInt(m[2], 10), ud = parseInt(m[3], 10);
+      if (un * d === r * ud) return true;
+    }
+    const val = parseFloat(s);
+    if (!Number.isNaN(val) && Math.abs(val - (q + r / d)) < 0.01) return true;
+    return false;
+  }
+
+
+  const GENERATORS = {
+    'Multiplication facts (squares & cubes)': () => {
+      const isCube = Math.random() < 0.5;
+      const n = isCube ? rand(2, 9) : rand(2, 12);
+      const ans = isCube ? n ** 3 : n ** 2;
+      return { meta: 'Multiplication facts', text: `${n}${isCube ? '³' : '²'} =`, check: u => checkPlainAnswer(u, ans), correct: fmt(ans) };
+    },
+    'Multiplying by multiples of 10': () => {
+      const aOptions = [20,30,40,50,60,70,80,90,100,200,300,400,500,600,700,800,900];
+      const a = aOptions[rand(0, aOptions.length - 1)];
+      const b = rand(2, 29);
+      const ans = a * b;
+      return { meta: 'Multiplying by multiples of 10', text: `${fmt(a)} × ${b} =`, check: u => checkPlainAnswer(u, ans), correct: fmt(ans) };
+    },
+    'Short multiplication': () => {
+      const a = rand(100, 9999), b = rand(2, 9);
+      const ans = a * b;
+      return { meta: 'Short multiplication', text: `${fmt(a)} × ${b} =`, check: u => checkPlainAnswer(u, ans), correct: fmt(ans) };
+    },
+    'Long multiplication': () => {
+      const a = rand(100, 9999), b = rand(11, 99);
+      const ans = a * b;
+      return { meta: 'Long multiplication', text: `${fmt(a)} × ${b} =`, check: u => checkPlainAnswer(u, ans), correct: fmt(ans) };
+    },
+    'Multiplying by 10, 100, 1000': () => {
+      const a = rand(2, 9999);
+      const factor = [10, 100, 1000][rand(0, 2)];
+      const ans = a * factor;
+      return { meta: 'Multiplying by 10/100/1000', text: `${fmt(a)} × ${fmt(factor)} =`, check: u => checkPlainAnswer(u, ans), correct: fmt(ans) };
+    },
+    'Dividing by 10, 100, 1000': () => {
+      const m = rand(10, 9999); // tenths
+      const a = m / 10;
+      const divisor = [10, 100][rand(0, 1)];
+      const ans = a / divisor;
+      return { meta: 'Dividing by 10/100', text: `${a} ÷ ${divisor} =`, check: u => checkDecimalAnswer(u, ans), correct: String(Math.round(ans * 10000) / 10000) };
+    },
+    'Division facts': () => {
+      const d = rand(2, 9), q = rand(10, 199), a = d * q;
+      return { meta: 'Division facts', text: `${fmt(a)} ÷ ${d} =`, check: u => checkPlainAnswer(u, q), correct: fmt(q) };
+    },
+    'Short division (one-digit)': () => {
+      const d = rand(2, 9), q = rand(20, 999);
+      const r = Math.random() < 0.5 ? 0 : rand(1, d - 1);
+      const a = d * q + r;
+      return {
+        meta: 'Short division (one-digit)', text: `${fmt(a)} ÷ ${d} =`,
+        check: u => checkRemainderAnswer(u, q, r, d),
+        correct: r === 0 ? fmt(q) : `${q} r${r}`,
+      };
+    },
+    'Short division (two-digit)': () => {
+      const d = rand(11, 99), q = rand(20, 499);
+      const r = Math.random() < 0.5 ? 0 : rand(1, d - 1);
+      const a = d * q + r;
+      return {
+        meta: 'Short division (two-digit)', text: `${fmt(a)} ÷ ${d} =`,
+        check: u => checkRemainderAnswer(u, q, r, d),
+        correct: r === 0 ? fmt(q) : `${q} r${r}`,
+      };
+    },
+    'Order of operations': () => {
+      const pattern = rand(1, 4);
+      if (pattern === 1) {
+        const c = rand(2, 9), k = rand(2, 12), b = c * k, a = rand(10, 90);
+        const ans = a + b / c;
+        return { meta: 'Order of operations', text: `${a} + ${fmt(b)} ÷ ${c} =`, check: u => checkPlainAnswer(u, ans), correct: fmt(ans) };
+      } else if (pattern === 2) {
+        const n = rand(2, 12), a = rand(5, 90);
+        const ans = n * n + a;
+        return { meta: 'Order of operations', text: `${n}² + ${a} =`, check: u => checkPlainAnswer(u, ans), correct: fmt(ans) };
+      } else if (pattern === 3) {
+        const a = rand(2, 12), b = rand(2, 20), c = rand(2, 20), ans = a * (b + c);
+        return { meta: 'Order of operations', text: `${a} × (${b} + ${c}) =`, check: u => checkPlainAnswer(u, ans), correct: fmt(ans) };
+      } else {
+        const a = rand(5, 90), b = rand(2, 12), c = rand(2, 12), ans = a + b * c;
+        return { meta: 'Order of operations', text: `${a} + ${b} × ${c} =`, check: u => checkPlainAnswer(u, ans), correct: fmt(ans) };
+      }
+    },
+  };
+
+
+  const SKILL_SEQUENCE = ["Multiplication facts (squares & cubes)", "Multiplication facts (squares & cubes)", "Multiplying by multiples of 10", "Multiplying by multiples of 10", "Short multiplication", "Short multiplication", "Short multiplication", "Long multiplication", "Long multiplication", "Multiplying by 10, 100, 1000", "Dividing by 10, 100, 1000", "Division facts", "Division facts", "Division facts", "Short division (one-digit)", "Short division (one-digit)", "Short division (two-digit)", "Short division (two-digit)", "Order of operations", "Order of operations"];
+  const MAX_ATTEMPTS = 5;
+  const ATTEMPTS_KEY = 's2s_practice_attempts_multiplication-division-practice';
+
+  let sequence = [];
+  let currentIndex = 0;
+  let currentGen = null;
+  let score = 0;
+  let answered = false;
+
+  function shuffledSkillSequence() {
+    const arr = SKILL_SEQUENCE.slice();
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+
+  function getAttemptsUsed() {
+    return parseInt(localStorage.getItem(ATTEMPTS_KEY) || '0', 10);
+  }
+
+  function showScreen(id) {
+    ['screen-start', 'screen-question', 'screen-end'].forEach(s => document.getElementById(s).style.display = 'none');
+    document.getElementById(id).style.display = 'block';
+  }
+
+  function refreshStartScreen() {
+    const used = getAttemptsUsed();
+    const note = document.getElementById('attempts-note');
+    const btn = document.getElementById('btn-start');
+    if (used >= MAX_ATTEMPTS) {
+      note.textContent = `You've completed ${used} practice run-throughs on this device — time to try the real course test!`;
+      btn.disabled = true;
+      btn.textContent = 'Practice limit reached';
+    } else {
+      note.textContent = `Practice run-throughs completed on this device: ${used} of ${MAX_ATTEMPTS}.`;
+      btn.disabled = false;
+      btn.textContent = 'Start practice';
+    }
+  }
+
+  window.addEventListener('DOMContentLoaded', () => {
+    showScreen('screen-start');
+    refreshStartScreen();
+  });
+
+  function startPractice() {
+    if (getAttemptsUsed() >= MAX_ATTEMPTS) { refreshStartScreen(); return; }
+    sequence = shuffledSkillSequence();
+    currentIndex = 0;
+    score = 0;
+    showScreen('screen-question');
+    renderQuestion();
+  }
+
+  function renderQuestion() {
+    answered = false;
+    const skill = sequence[currentIndex];
+    currentGen = GENERATORS[skill]();
+    document.getElementById('q-counter').textContent = `Question ${currentIndex + 1} of ${sequence.length}`;
+    document.getElementById('q-meta').textContent = currentGen.meta;
+    document.getElementById('q-text').textContent = currentGen.text;
+    const input = document.getElementById('answer-input');
+    input.value = '';
+    input.disabled = false;
+    input.focus();
+    document.getElementById('feedback').textContent = '';
+    document.getElementById('feedback').className = 'feedback';
+    document.getElementById('btn-check').style.display = 'inline-block';
+    document.getElementById('btn-nextq').style.display = 'none';
+    input.onkeydown = e => { if (e.key === 'Enter') { if (!answered) checkAnswer(); else nextQuestion(); } };
+  }
+
+  function checkAnswer() {
+    if (answered) return;
+    const input = document.getElementById('answer-input');
+    const val = input.value.trim();
+    if (!val) return;
+    answered = true;
+    input.disabled = true;
+    const ok = currentGen.check(val);
+    const fb = document.getElementById('feedback');
+    if (ok) {
+      score++;
+      fb.textContent = '✓ Correct!';
+      fb.className = 'feedback correct';
+    } else {
+      fb.textContent = `✗ Not quite. The answer was ${currentGen.correct}.`;
+      fb.className = 'feedback incorrect';
+    }
+    document.getElementById('btn-check').style.display = 'none';
+    document.getElementById('btn-nextq').style.display = 'inline-block';
+    document.getElementById('btn-nextq').textContent = currentIndex === sequence.length - 1 ? 'See my score →' : 'Next →';
+    document.getElementById('btn-nextq').focus();
+  }
+
+  function nextQuestion() {
+    if (currentIndex < sequence.length - 1) {
+      currentIndex++;
+      renderQuestion();
+    } else {
+      finishPractice();
+    }
+  }
+
+  function finishPractice() {
+    const used = getAttemptsUsed() + 1;
+    localStorage.setItem(ATTEMPTS_KEY, String(used));
+    showScreen('screen-end');
+    document.getElementById('end-score').textContent = `${score} / ${sequence.length}`;
+    const msg = document.getElementById('end-message');
+    if (used >= MAX_ATTEMPTS) {
+      msg.textContent = `That's ${used} practice run-throughs on this device — you've reached the limit. Time to take the real course test!`;
+      document.getElementById('btn-again').disabled = true;
+      document.getElementById('btn-again').textContent = 'Practice limit reached';
+    } else {
+      msg.textContent = `Nice work. You can practise ${MAX_ATTEMPTS - used} more time${MAX_ATTEMPTS - used === 1 ? '' : 's'} on this device before taking the real course test.`;
+    }
+  }
+</script>
+</body>
+</html>

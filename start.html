@@ -615,7 +615,7 @@
     </div>
 
     <div class="summary hidden" id="summary">
-      <span class="txt"><b id="summary-done">0</b> of <b id="summary-total">19</b> module tests completed</span>
+      <span class="txt"><b id="summary-done">0</b> of <b id="summary-total">19</b> tests completed</span>
       <span class="bar"><span id="summary-bar"></span></span>
     </div>
 
@@ -641,6 +641,8 @@
         [1, 'module1-addition', 'Addition', 8, 8],
         [2, 'module2-subtraction', 'Subtraction & Inverse', 12, 12],
       ],
+      courseTest: ['addition-subtraction-course', 'Addition & Subtraction — Course Test', 20, 20],
+      practiceTest: ['addition-subtraction-practice', 'Addition & Subtraction — Practice'],
     },
     {
       name: 'Multiplication & Division',
@@ -656,6 +658,8 @@
         [10, 'module10-short-division-two-digits', 'Short Division by Two Digits', 6, 12],
         [11, 'module11-order-of-operations', 'Order of Operations', 6, 6],
       ],
+      courseTest: ['multiplication-division-course', 'Multiplication & Division — Course Test', 20, 24],
+      practiceTest: ['multiplication-division-practice', 'Multiplication & Division — Practice'],
     },
     {
       name: 'Fractions',
@@ -667,6 +671,8 @@
         [15, 'module15-multiplying-fractions', 'Multiplying Fractions', 9, 9],
         [16, 'module16-dividing-fractions', 'Dividing Fractions', 6, 6],
       ],
+      courseTest: ['fractions-course', 'Fractions — Course Test', 20, 20],
+      practiceTest: ['fractions-practice', 'Fractions — Practice'],
     },
     {
       name: 'Decimals & Percentages',
@@ -676,12 +682,9 @@
         [18, 'module18-multiplying-decimals', 'Multiplying Decimals', 6, 6],
         [19, 'module19-percentages', 'Percentages', 6, 6],
       ],
+      courseTest: ['decimals-percentages-course', 'Decimals & Percentages — Course Test', 20, 20],
+      practiceTest: ['decimals-percentages-practice', 'Decimals & Percentages — Practice'],
     },
-  ];
-
-  const COMING_SOON = [
-    ['Course Tests', 'One timed test at the end of each course, with a certificate.'],
-    ['Full Practice Tests', 'Complete arithmetic papers, just like the real thing.'],
   ];
 
   const ARROW = '<svg class="arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>';
@@ -703,7 +706,7 @@
     const wrap = document.getElementById('course-sections');
 
     const live = COURSES.map(c => {
-      const cards = c.tests.map(([n, slug, title, qs, marks]) => {
+      const moduleCards = c.tests.map(([n, slug, title, qs, marks]) => {
         const marksNote = marks === qs ? `${qs} questions` : `${qs} questions &middot; ${marks} marks`;
         return `<a class="test-card" data-slug="${esc(slug)}" href="${esc(slug)}.html">
             <span class="n">Module ${n}</span>
@@ -713,35 +716,47 @@
           </a>`;
       }).join('');
 
+      let courseTestCard = '';
+      if (c.courseTest) {
+        const [slug, title, qs, marks] = c.courseTest;
+        const marksNote = marks === qs ? `${qs} questions &middot; 40 min` : `${qs} questions &middot; ${marks} marks &middot; 40 min`;
+        courseTestCard = `<a class="test-card" data-slug="${esc(slug)}" href="${esc(slug)}.html">
+            <span class="n">Course Test</span>
+            <span class="t">${esc(title)}</span>
+            <span class="q">${marksNote}</span>
+            ${ARROW}
+          </a>`;
+      }
+
+      let practiceTestCard = '';
+      if (c.practiceTest) {
+        const [slug, title] = c.practiceTest;
+        practiceTestCard = `<a class="test-card" href="${esc(slug)}.html">
+            <span class="n">Practice</span>
+            <span class="t">${esc(title)}</span>
+            <span class="q">Unlimited &middot; nothing saved</span>
+            ${ARROW}
+          </a>`;
+      }
+
       const totalQs = c.tests.reduce((a, t) => a + t[3], 0);
-      const label = c.tests.length === 1 ? '1 test' : `${c.tests.length} tests`;
+      const cardCount = c.tests.length + (c.courseTest ? 1 : 0) + (c.practiceTest ? 1 : 0);
+      const label = cardCount === 1 ? '1 test' : `${cardCount} tests`;
 
       return `<section class="course" style="--accent:${c.accent};--accent-soft:${c.soft};--accent-text:${c.text}">
           <div class="course-head">
             <span class="course-dot"></span>
             <div class="course-head-text">
               <h3>${esc(c.name)}</h3>
-              <div class="meta">${totalQs} questions in total</div>
+              <div class="meta">${totalQs} module questions, plus a course test and practice</div>
             </div>
             <span class="course-count">${label}</span>
           </div>
-          <div class="test-grid">${cards}</div>
+          <div class="test-grid">${moduleCards}${courseTestCard}${practiceTestCard}</div>
         </section>`;
     }).join('');
 
-    const soon = COMING_SOON.map(([name, blurb]) => `
-      <section class="course soon">
-        <div class="course-head">
-          <span class="course-dot" style="--accent:#CFD4EC;--accent-soft:#EDEFF8"></span>
-          <div class="course-head-text">
-            <h3>${esc(name)}</h3>
-            <div class="meta">${esc(blurb)}</div>
-          </div>
-          <span class="soon-tag">Coming soon</span>
-        </div>
-      </section>`).join('');
-
-    wrap.innerHTML = live + soon;
+    wrap.innerHTML = live;
   }
 
   /* ---------------------------------------------------------
