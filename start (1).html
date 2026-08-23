@@ -1,0 +1,1152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="theme-color" content="#0D0080" />
+<title>Assessments | Steps 2 Success</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,700;0,9..144,800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  /* ============================================================
+     Steps 2 Success — design tokens
+     ============================================================ */
+  :root {
+    --royal-deep:   #0D0080;
+    --royal:        #1800AB;
+    --blue-mid:     #3D2FC4;
+    --blue-tint:    #D6D2FF;
+    --cyan:         #5EDDE0;
+    --cyan-mid:     #2AB8BC;
+    --cyan-tint:    #E0F9FA;
+    --gold:         #E8B800;
+    --gold-deep:    #C49A00;
+    --gold-tint:    #FFF8CC;
+    --ink:          #0D0D0D;
+    --ink-soft:     #4A4A4A;
+    --page:         #F4F5FB;
+    --white:        #FFFFFF;
+    --green:        #27C47A;
+    --amber:        #F5A623;
+
+    --line:         #E4E7F5;
+    --line-strong:  #CFD4EC;
+
+    --sh-sm: 0 1px 2px rgba(13,0,128,0.06), 0 2px 6px rgba(13,0,128,0.05);
+    --sh-md: 0 2px 4px rgba(13,0,128,0.06), 0 8px 20px rgba(13,0,128,0.08);
+    --sh-lg: 0 4px 8px rgba(13,0,128,0.07), 0 18px 44px rgba(13,0,128,0.12);
+
+    --r-sm: 8px;
+    --r-md: 12px;
+    --r-lg: 18px;
+
+    --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { -webkit-text-size-adjust: 100%; }
+
+  body {
+    font-family: 'DM Sans', system-ui, sans-serif;
+    background: var(--page);
+    color: var(--ink);
+    min-height: 100vh;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Soft brand wash behind the top of the page */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0 0 auto 0;
+    height: 460px;
+    background:
+      radial-gradient(900px 320px at 20% -10%, rgba(94,221,224,0.20), transparent 70%),
+      radial-gradient(700px 300px at 85% -20%, rgba(214,210,255,0.55), transparent 70%);
+    -webkit-mask-image: linear-gradient(to bottom, #000 55%, transparent 100%);
+    mask-image: linear-gradient(to bottom, #000 55%, transparent 100%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  a { color: inherit; }
+
+  :focus-visible {
+    outline: 3px solid var(--cyan-mid);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  /* ============================================================
+     Header
+     ============================================================ */
+  header {
+    position: relative;
+    z-index: 2;
+    background: var(--royal-deep);
+    color: var(--white);
+    padding: 26px 24px 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 14px;
+    box-shadow: var(--sh-md);
+  }
+  header::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--cyan) 0%, var(--cyan-mid) 45%, var(--gold) 100%);
+  }
+  header img {
+    height: 76px; width: auto; display: block;
+    background: var(--white);
+    padding: 11px 20px;
+    border-radius: 16px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.24), 0 1px 3px rgba(0,0,0,0.16);
+  }
+  .header-text h1 {
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 1.42rem;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    line-height: 1.25;
+  }
+  .header-text p {
+    font-size: 0.84rem;
+    color: var(--cyan);
+    font-weight: 500;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    margin-top: 3px;
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 40px 20px 72px;
+  }
+
+  /* ============================================================
+     Login view
+     ============================================================ */
+  .login-shell { max-width: 460px; margin: 24px auto 0; }
+
+  .login-card {
+    background: var(--white);
+    border-radius: var(--r-lg);
+    padding: 40px 38px 34px;
+    box-shadow: var(--sh-lg);
+    border: 1px solid var(--line);
+  }
+  .login-eyebrow {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--cyan-mid);
+    margin-bottom: 10px;
+  }
+  .login-card h2 {
+    font-family: 'Fraunces', Georgia, serif;
+    color: var(--royal-deep);
+    font-size: 1.7rem;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    margin-bottom: 10px;
+  }
+  .login-card .lede {
+    color: var(--ink-soft);
+    font-size: 0.93rem;
+    line-height: 1.6;
+    margin-bottom: 26px;
+  }
+
+  .field { margin-bottom: 18px; }
+  .field label {
+    display: block;
+    font-size: 0.74rem;
+    font-weight: 700;
+    color: var(--royal-deep);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 7px;
+  }
+  .field input {
+    width: 100%;
+    padding: 13px 15px;
+    border: 2px solid var(--line-strong);
+    border-radius: var(--r-sm);
+    font-size: 1rem;
+    font-family: inherit;
+    color: var(--ink);
+    background: var(--white);
+    transition: border-color 0.18s var(--ease), background 0.18s var(--ease), box-shadow 0.18s var(--ease);
+  }
+  .field input::placeholder { color: #A6ADC8; }
+  .field input:hover { border-color: #B9C0DC; }
+  .field input:focus {
+    outline: none;
+    border-color: var(--cyan-mid);
+    background: var(--cyan-tint);
+    box-shadow: 0 0 0 4px rgba(42,184,188,0.15);
+  }
+
+  .btn-gold {
+    width: 100%;
+    padding: 15px;
+    background: var(--gold);
+    color: var(--ink);
+    border: none;
+    border-radius: var(--r-sm);
+    font-family: inherit;
+    font-weight: 700;
+    font-size: 1rem;
+    letter-spacing: 0.01em;
+    cursor: pointer;
+    margin-top: 8px;
+    box-shadow: 0 2px 0 var(--gold-deep);
+    transition: background 0.18s var(--ease), transform 0.12s var(--ease), box-shadow 0.12s var(--ease);
+  }
+  .btn-gold:hover { background: #F2C50C; }
+  .btn-gold:active { transform: translateY(2px); box-shadow: 0 0 0 var(--gold-deep); }
+
+  .login-foot {
+    margin-top: 20px;
+    padding-top: 18px;
+    border-top: 1px solid var(--line);
+    font-size: 0.82rem;
+    color: var(--ink-soft);
+    line-height: 1.55;
+    display: flex;
+    gap: 9px;
+    align-items: flex-start;
+  }
+  .login-foot svg { flex: 0 0 auto; margin-top: 2px; }
+
+  .form-error {
+    background: #FCE9E8;
+    color: #B23B3A;
+    border-left: 4px solid #E24B4A;
+    padding: 11px 15px;
+    border-radius: 0 var(--r-sm) var(--r-sm) 0;
+    margin-bottom: 18px;
+    font-size: 0.87rem;
+    font-weight: 500;
+    display: none;
+  }
+
+  /* ============================================================
+     Test list view
+     ============================================================ */
+  #list-view { display: none; }
+
+  .whoami {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 14px;
+    background: var(--white);
+    border: 1px solid var(--line);
+    border-radius: var(--r-md);
+    padding: 15px 20px;
+    margin-bottom: 26px;
+    box-shadow: var(--sh-sm);
+    flex-wrap: wrap;
+  }
+  .whoami-id { display: flex; align-items: center; gap: 13px; min-width: 0; }
+  .avatar {
+    flex: 0 0 auto;
+    width: 42px; height: 42px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--royal-deep), var(--blue-mid));
+    color: var(--white);
+    display: grid;
+    place-items: center;
+    font-weight: 700;
+    font-size: 0.95rem;
+    letter-spacing: 0.02em;
+  }
+  .whoami .name {
+    font-weight: 700;
+    color: var(--royal-deep);
+    font-size: 1rem;
+    line-height: 1.3;
+    overflow-wrap: anywhere;
+  }
+  .whoami .email {
+    color: var(--ink-soft);
+    font-size: 0.83rem;
+    line-height: 1.3;
+    overflow-wrap: anywhere;
+  }
+  .whoami a {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--royal-deep);
+    text-decoration: none;
+    border-bottom: 1.5px solid var(--line-strong);
+    padding-bottom: 1px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: color 0.16s var(--ease), border-color 0.16s var(--ease);
+  }
+  .whoami a:hover { color: var(--blue-mid); border-color: var(--cyan-mid); }
+
+  .page-intro { margin-bottom: 24px; }
+  .page-intro h2 {
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--royal-deep);
+    letter-spacing: -0.02em;
+    margin-bottom: 5px;
+  }
+  .page-intro p { color: var(--ink-soft); font-size: 0.93rem; }
+
+  /* --- Course section --- */
+  .course {
+    background: var(--white);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    box-shadow: var(--sh-sm);
+    margin-bottom: 20px;
+    overflow: hidden;
+  }
+  .course-head {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid var(--line);
+    background: linear-gradient(180deg, rgba(244,245,251,0.7), rgba(255,255,255,0));
+  }
+  .course-dot {
+    flex: 0 0 auto;
+    width: 11px; height: 11px;
+    border-radius: 50%;
+    background: var(--accent, var(--cyan-mid));
+    box-shadow: 0 0 0 4px var(--accent-soft, var(--cyan-tint));
+  }
+  .course-head-text { flex: 1 1 auto; min-width: 0; }
+  .course-head h3 {
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 1.12rem;
+    font-weight: 700;
+    color: var(--royal-deep);
+    letter-spacing: -0.01em;
+    line-height: 1.3;
+  }
+  .course-head .meta {
+    font-size: 0.8rem;
+    color: var(--ink-soft);
+    margin-top: 1px;
+  }
+  .course-count {
+    flex: 0 0 auto;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--royal-deep);
+    background: var(--page);
+    border: 1px solid var(--line);
+    border-radius: 99px;
+    padding: 5px 12px;
+    white-space: nowrap;
+  }
+
+  .test-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(238px, 1fr));
+    gap: 12px;
+    padding: 18px 24px 24px;
+  }
+
+  .test-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    background: var(--white);
+    border: 1.5px solid var(--line);
+    border-left: 4px solid var(--accent, var(--cyan-mid));
+    border-radius: var(--r-md);
+    padding: 15px 40px 15px 17px;
+    transition: transform 0.16s var(--ease), box-shadow 0.16s var(--ease),
+                border-color 0.16s var(--ease), background 0.16s var(--ease);
+  }
+  .test-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--sh-md);
+    border-color: var(--line-strong);
+    border-left-color: var(--accent, var(--cyan-mid));
+    background: var(--accent-soft, var(--cyan-tint));
+  }
+  .test-card:active { transform: translateY(0); }
+
+  .test-card .n {
+    display: block;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.11em;
+    text-transform: uppercase;
+    color: var(--accent-text, var(--cyan-mid));
+    margin-bottom: 4px;
+  }
+  .test-card .t {
+    display: block;
+    font-weight: 700;
+    font-size: 0.97rem;
+    color: var(--royal-deep);
+    line-height: 1.32;
+    letter-spacing: -0.005em;
+    margin-bottom: 6px;
+  }
+  .test-card .q {
+    display: block;
+    font-size: 0.79rem;
+    color: var(--ink-soft);
+    font-weight: 400;
+    margin-top: auto; /* keeps the question count on a common baseline across a row */
+  }
+  .test-card .arrow {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--accent, var(--cyan-mid));
+    opacity: 0.65;
+    transition: transform 0.18s var(--ease), opacity 0.18s var(--ease);
+  }
+  .test-card:hover .arrow { transform: translateY(-50%) translateX(3px); opacity: 1; }
+
+  /* ---- Status states ---- */
+  .status {
+    display: inline-flex;
+    align-items: center;
+    align-self: flex-start; /* hug the text rather than stretching to card width */
+    gap: 5px;
+    margin-top: 8px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 3px 10px 3px 8px;
+    border-radius: 99px;
+    white-space: nowrap;
+  }
+  .status svg { flex: 0 0 auto; }
+
+  /* Completed — green fill, calm, clearly "done" */
+  .test-card.done {
+    background: #EDFBF4;
+    border-color: #BCEBD5;
+    border-left-color: var(--green);
+  }
+  .test-card.done:hover { background: #DFF7EB; border-left-color: var(--green); }
+  .test-card.done .n { color: #1B9A5E; }
+  .test-card.done .arrow { color: var(--green); }
+  .status.done { background: var(--green); color: #04301C; }
+
+  /* Resume — amber, the one that asks for attention */
+  .test-card.resume {
+    background: #FFF6E6;
+    border-color: #F7DFAE;
+    border-left-color: var(--amber);
+    box-shadow: 0 0 0 1px rgba(245,166,35,0.12);
+  }
+  .test-card.resume:hover { background: #FFEFD3; border-left-color: var(--amber); }
+  .test-card.resume .n { color: #9A6407; }
+  .test-card.resume .arrow { color: var(--amber); }
+  .status.resume { background: var(--amber); color: #3D2800; }
+
+  /* Locked — course test not yet available (modules not all complete) */
+  .test-card.locked {
+    cursor: default;
+    background: #F3F4F9;
+    border-color: var(--line);
+    border-left-color: var(--line-strong);
+    opacity: 0.85;
+  }
+  .test-card.locked:hover {
+    transform: none;
+    box-shadow: none;
+    background: #F3F4F9;
+    border-color: var(--line);
+    border-left-color: var(--line-strong);
+  }
+  .test-card.locked .n { color: var(--ink-soft); }
+  .status.locked { background: var(--line-strong); color: var(--ink-soft); }
+
+  /* ---- Course tabs ---- */
+  .tabbar {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 6px;
+    margin-bottom: 22px;
+    scrollbar-width: thin;
+    -webkit-overflow-scrolling: touch;
+  }
+  .tab-btn {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 17px;
+    border-radius: 99px;
+    border: 1.5px solid var(--line-strong);
+    background: var(--white);
+    color: var(--ink-soft);
+    font-family: inherit;
+    font-weight: 700;
+    font-size: 0.86rem;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.16s var(--ease), border-color 0.16s var(--ease), color 0.16s var(--ease);
+  }
+  .tab-btn .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--tab-accent, var(--cyan-mid));
+    flex: 0 0 auto;
+  }
+  .tab-btn:hover { border-color: var(--tab-accent, var(--line-strong)); background: var(--page); }
+  .tab-btn.active {
+    background: var(--tab-accent, var(--royal-deep));
+    border-color: var(--tab-accent, var(--royal-deep));
+    color: var(--white);
+  }
+  .tab-btn.active .dot { background: var(--white); }
+
+  /* ---- Sub-sections within a course (module / course test / practice) ---- */
+  .course-body { padding: 18px 24px 24px; }
+  .section-group { margin-bottom: 24px; }
+  .section-group:last-child { margin-bottom: 0; }
+  .section-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 11px;
+  }
+  .section-label .txt {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    white-space: nowrap;
+  }
+  .section-label .hint {
+    font-size: 0.72rem;
+    color: var(--ink-soft);
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: normal;
+    white-space: nowrap;
+  }
+  .section-label .rule { flex: 1 1 auto; height: 1px; background: var(--line); }
+
+  /* Course test: one prominent, full-width card */
+  .test-card.feature {
+    padding: 20px 46px 20px 22px;
+    border-left-width: 5px;
+  }
+  .test-card.feature .t { font-size: 1.08rem; }
+  .test-card.feature .n { color: var(--accent-text, var(--cyan-mid)); }
+
+  /* Practice: one full-width card, visually "lighter weight" than a real test */
+  .test-card.practice {
+    border-style: dashed;
+    background: var(--page);
+    padding: 16px 46px 16px 20px;
+  }
+  .test-card.practice:hover { background: var(--accent-soft, var(--cyan-tint)); }
+
+  .practice-note {
+    display: flex;
+    gap: 9px;
+    align-items: flex-start;
+    margin-top: 10px;
+    padding: 10px 14px;
+    background: var(--gold-tint);
+    border: 1px solid #F0DE8A;
+    border-left: 4px solid var(--gold);
+    border-radius: 0 var(--r-sm) var(--r-sm) 0;
+    font-size: 0.83rem;
+    color: #6B5400;
+    line-height: 1.5;
+  }
+  .practice-note svg { flex: 0 0 auto; margin-top: 1px; color: var(--gold-deep); }
+  .practice-note strong { color: #4A3A00; }
+
+  /* ---- Progress summary ---- */
+  .summary {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: var(--white);
+    border: 1px solid var(--line);
+    border-radius: var(--r-md);
+    padding: 14px 20px;
+    margin-bottom: 22px;
+    box-shadow: var(--sh-sm);
+    flex-wrap: wrap;
+  }
+  .summary .bar {
+    flex: 1 1 180px;
+    height: 9px;
+    background: var(--blue-tint);
+    border-radius: 99px;
+    overflow: hidden;
+    box-shadow: inset 0 1px 2px rgba(13,0,128,0.08);
+  }
+  .summary .bar span {
+    display: block;
+    height: 100%;
+    width: 0%;
+    border-radius: 99px;
+    background: linear-gradient(90deg, var(--green), #4BD897);
+    transition: width 0.5s var(--ease);
+  }
+  .summary .txt { font-size: 0.87rem; color: var(--ink-soft); white-space: nowrap; }
+  .summary .txt b { color: var(--royal-deep); font-weight: 700; }
+  .summary.hidden { display: none; }
+
+  /* --- Coming soon --- */
+  .course.soon { background: transparent; box-shadow: none; border-style: dashed; border-color: var(--line-strong); }
+  .course.soon .course-head { background: none; border-bottom: none; padding-bottom: 20px; }
+  .course.soon .course-head h3 { color: var(--ink-soft); }
+  .soon-tag {
+    flex: 0 0 auto;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    background: var(--white);
+    border: 1px solid var(--line-strong);
+    border-radius: 99px;
+    padding: 5px 12px;
+    white-space: nowrap;
+  }
+
+  .page-foot {
+    margin-top: 34px;
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--ink-soft);
+  }
+
+  /* ============================================================
+     Responsive
+     ============================================================ */
+  @media (max-width: 620px) {
+    header { padding: 20px 16px 18px; gap: 11px; }
+    header img { height: 56px; padding: 9px 15px; border-radius: 13px; }
+    .header-text h1 { font-size: 1.18rem; }
+    .header-text p { font-size: 0.75rem; }
+    .container { padding: 26px 14px 56px; }
+    .login-card { padding: 30px 22px 26px; border-radius: var(--r-md); }
+    .login-card h2 { font-size: 1.42rem; }
+    .page-intro h2 { font-size: 1.32rem; }
+    .test-grid { grid-template-columns: 1fr; padding: 15px 15px 19px; gap: 10px; }
+    .course-head { padding: 17px 16px 14px; }
+    .whoami { padding: 13px 15px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { transition: none !important; animation: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <img src="logo_cropped.png" alt="Steps 2 Success Education" />
+  <div class="header-text">
+    <h1>Steps 2 Success</h1>
+    <p>Arithmetic Assessments</p>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- ================= LOGIN VIEW ================= -->
+  <div id="login-view">
+    <div class="login-shell">
+      <div class="login-card">
+        <span class="login-eyebrow">Before you begin</span>
+        <h2>Let's get you set up</h2>
+        <p class="lede">Enter your name and email once, and you won't need to type them again while you're here. If you started a test before and didn't finish, opening it again will pick up exactly where you left off.</p>
+
+        <div class="form-error" id="form-error">Please enter your full name and a valid email address.</div>
+
+        <form id="login-form" novalidate>
+          <div class="field">
+            <label for="in-name">Full name</label>
+            <input type="text" id="in-name" placeholder="e.g. Alex Smith" autocomplete="name" />
+          </div>
+          <div class="field">
+            <label for="in-email">Email address</label>
+            <input type="email" id="in-email" placeholder="e.g. alex@email.com" autocomplete="email" />
+          </div>
+          <button type="submit" class="btn-gold">Continue to my tests</button>
+        </form>
+
+        <div class="login-foot">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2AB8BC" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+          <span>Use the same name and email each time. That is how your results and saved progress are matched to you.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= LIST VIEW ================= -->
+  <div id="list-view">
+
+    <div class="whoami">
+      <div class="whoami-id">
+        <div class="avatar" id="whoami-initials" aria-hidden="true"></div>
+        <div>
+          <div class="name" id="whoami-name"></div>
+          <div class="email" id="whoami-email"></div>
+        </div>
+      </div>
+      <a id="logout-link" role="button" tabindex="0">Not you? Log out</a>
+    </div>
+
+    <div class="page-intro">
+      <h2>Your assessments</h2>
+      <p>Take these in any order, whenever you are ready. Your progress saves as you go.</p>
+    </div>
+
+    <div class="summary hidden" id="summary">
+      <span class="txt"><b id="summary-done">0</b> of <b id="summary-total">19</b> tests completed</span>
+      <span class="bar"><span id="summary-bar"></span></span>
+    </div>
+
+    <div class="tabbar" id="tabbar" role="tablist" aria-label="Choose a topic"></div>
+
+    <div id="course-sections"></div>
+
+    <div class="page-foot">Steps 2 Success Education</div>
+  </div>
+
+</div>
+
+<script>
+  /* ---------------------------------------------------------
+     Test data. Static by design: the list of tests changes only
+     when new content ships, so this avoids opening up any public
+     read access to the database just to render a menu.
+     [module number, file slug, title, questions, marks]
+     --------------------------------------------------------- */
+  const COURSES = [
+    {
+      name: 'Addition & Subtraction',
+      accent: '#2AB8BC', soft: '#E0F9FA', text: '#1F9296',
+      tests: [
+        [1, 'module1-addition', 'Addition', 8, 8],
+        [2, 'module2-subtraction', 'Subtraction & Inverse', 12, 12],
+      ],
+      courseTest: ['addition-subtraction-course', 'Addition & Subtraction — Course Test', 20, 20],
+      practiceTest: ['addition-subtraction-practice', 'Addition & Subtraction — Course Practice Test'],
+    },
+    {
+      name: 'Multiplication & Division',
+      accent: '#3D2FC4', soft: '#EEECFF', text: '#3D2FC4',
+      tests: [
+        [3, 'module3-multiplication-facts-1', 'Multiplication Facts 1', 15, 15],
+        [4, 'module4-multiplication-facts-2', 'Multiplication Facts 2', 9, 9],
+        [5, 'module5-short-multiplication', 'Short Multiplication', 6, 6],
+        [6, 'module6-long-multiplication', 'Long Multiplication', 6, 12],
+        [7, 'module7-multiply-divide-10-100-1000', 'Multiply & Divide by 10, 100 and 1000', 9, 9],
+        [8, 'module8-division-facts-mental-methods', 'Division Facts & Mental Methods', 6, 6],
+        [9, 'module9-short-division-one-digit', 'Short Division by One Digit', 6, 6],
+        [10, 'module10-short-division-two-digits', 'Short Division by Two Digits', 6, 12],
+        [11, 'module11-order-of-operations', 'Order of Operations', 6, 6],
+      ],
+      courseTest: ['multiplication-division-course', 'Multiplication & Division — Course Test', 20, 24],
+      practiceTest: ['multiplication-division-practice', 'Multiplication & Division — Course Practice Test'],
+    },
+    {
+      name: 'Fractions',
+      accent: '#C49A00', soft: '#FFF8CC', text: '#8A6D00',
+      tests: [
+        [12, 'module12-adding-subtracting-fractions', 'Adding & Subtracting Fractions', 6, 6],
+        [13, 'module13-adding-mixed-numbers', 'Adding Mixed Numbers', 6, 6],
+        [14, 'module14-subtracting-mixed-numbers', 'Subtracting from Mixed Numbers', 6, 6],
+        [15, 'module15-multiplying-fractions', 'Multiplying Fractions', 9, 9],
+        [16, 'module16-dividing-fractions', 'Dividing Fractions', 6, 6],
+      ],
+      courseTest: ['fractions-course', 'Fractions — Course Test', 20, 20],
+      practiceTest: ['fractions-practice', 'Fractions — Course Practice Test'],
+    },
+    {
+      name: 'Decimals & Percentages',
+      accent: '#1800AB', soft: '#E8E5FF', text: '#1800AB',
+      tests: [
+        [17, 'module17-adding-subtracting-decimals', 'Adding & Subtracting Decimals', 6, 6],
+        [18, 'module18-multiplying-decimals', 'Multiplying Decimals', 6, 6],
+        [19, 'module19-percentages', 'Percentages', 6, 6],
+      ],
+      courseTest: ['decimals-percentages-course', 'Decimals & Percentages — Course Test', 20, 20],
+      practiceTest: ['decimals-percentages-practice', 'Decimals & Percentages — Course Practice Test'],
+    },
+  ];
+
+  /* Full arithmetic tests: whole-syllabus SATs-style papers (36 Qs / 40 marks / 30 min,
+     one attempt, gated behind ALL 19 module tests across every course). Shared content --
+     identical in every course tab, positioned below that course's Course Test. */
+  const FULL_TESTS = [
+    ['full-arithmetic-2026', 'Full Arithmetic Test — 2026'],
+    ['full-arithmetic-2025', 'Full Arithmetic Test — 2025'],
+    ['full-arithmetic-2024', 'Full Arithmetic Test — 2024'],
+    ['full-arithmetic-2023', 'Full Arithmetic Test — 2023'],
+  ];
+
+  const ARROW = '<svg class="arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>';
+  const INFO_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>';
+
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, c => (
+      { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]
+    ));
+  }
+
+  function initials(name) {
+    const parts = name.trim().split(/\s+/).filter(Boolean);
+    if (!parts.length) return '?';
+    if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  }
+
+  let activeCourseIndex = 0;
+  let progressMap = null;
+
+  function renderTabs() {
+    const bar = document.getElementById('tabbar');
+    bar.innerHTML = COURSES.map((c, i) => `
+        <button type="button" class="tab-btn ${i === activeCourseIndex ? 'active' : ''}"
+                data-idx="${i}" style="--tab-accent:${c.accent}"
+                role="tab" aria-selected="${i === activeCourseIndex}">
+          <span class="dot"></span>${esc(c.name)}
+        </button>`).join('');
+
+    bar.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        activeCourseIndex = parseInt(btn.dataset.idx, 10);
+        renderTabs();
+        renderActivePanel();
+        decoratePanel(progressMap);
+      });
+    });
+  }
+
+  function courseSectionHTML(c) {
+    const moduleCards = c.tests.map(([n, slug, title, qs, marks]) => {
+      const marksNote = marks === qs ? `${qs} questions` : `${qs} questions &middot; ${marks} marks`;
+      return `<a class="test-card" data-slug="${esc(slug)}" href="${esc(slug)}.html">
+          <span class="n">Module ${n}</span>
+          <span class="t">${esc(title)}</span>
+          <span class="q">${marksNote}</span>
+          ${ARROW}
+        </a>`;
+    }).join('');
+
+    let courseTestCard = '';
+    if (c.courseTest) {
+      const [slug, title, qs, marks] = c.courseTest;
+      const marksNote = marks === qs ? `${qs} questions` : `${qs} questions &middot; ${marks} marks`;
+      courseTestCard = `<a class="test-card feature" data-slug="${esc(slug)}" href="${esc(slug)}.html">
+          <span class="n">Course Test</span>
+          <span class="t">${esc(title)}</span>
+          <span class="q">${marksNote}</span>
+          ${ARROW}
+        </a>`;
+    }
+
+    let practiceTestCard = '';
+    if (c.practiceTest) {
+      const [slug, title] = c.practiceTest;
+      practiceTestCard = `<a class="test-card practice" href="${esc(slug)}.html">
+          <span class="n">Course Practice Test</span>
+          <span class="t">${esc(title)}</span>
+          <span class="q">Unlimited attempts</span>
+          ${ARROW}
+        </a>`;
+    }
+
+    const fullTestCards = FULL_TESTS.map(([slug, title]) => `<a class="test-card feature" data-slug="${esc(slug)}" href="${esc(slug)}.html">
+          <span class="n">Full Test</span>
+          <span class="t">${esc(title)}</span>
+          <span class="q">36 questions &middot; 40 marks &middot; 30 min</span>
+          ${ARROW}
+        </a>`).join('');
+
+    const totalQs = c.tests.reduce((a, t) => a + t[3], 0);
+    const cardCount = c.tests.length + (c.courseTest ? 1 : 0) + (c.practiceTest ? 1 : 0);
+    const label = cardCount === 1 ? '1 test' : `${cardCount} tests`;
+
+    return `<section class="course" style="--accent:${c.accent};--accent-soft:${c.soft};--accent-text:${c.text}">
+        <div class="course-head">
+          <span class="course-dot"></span>
+          <div class="course-head-text">
+            <h3>${esc(c.name)}</h3>
+            <div class="meta">${totalQs} module questions, plus a course test and a course practice test</div>
+          </div>
+          <span class="course-count">${label}</span>
+        </div>
+        <div class="course-body">
+          <div class="section-group">
+            <div class="section-label">
+              <span class="txt">Module tests</span>
+              <span class="rule"></span>
+              <span class="hint">${c.tests.length} in this topic</span>
+            </div>
+            <div class="test-grid">${moduleCards}</div>
+          </div>
+          ${c.practiceTest ? `<div class="section-group">
+            <div class="section-label">
+              <span class="txt">Course Practice Test</span>
+              <span class="rule"></span>
+              <span class="hint">Warm up before the course test</span>
+            </div>
+            ${practiceTestCard}
+            <p class="practice-note">
+              ${INFO_ICON}
+              <span><strong>Practice up to 5 times</strong> before completing the actual test. Course tests can only be completed once!</span>
+            </p>
+          </div>` : ''}
+          ${c.courseTest ? `<div class="section-group">
+            <div class="section-label">
+              <span class="txt">Course test</span>
+              <span class="rule"></span>
+              <span class="hint">Sit once every module is done</span>
+            </div>
+            ${courseTestCard}
+          </div>` : ''}
+          <div class="section-group">
+            <div class="section-label">
+              <span class="txt">Full Arithmetic Tests</span>
+              <span class="rule"></span>
+              <span class="hint">Sit once every module is done, across all 4 courses</span>
+            </div>
+            <div class="test-grid">${fullTestCards}</div>
+            <p class="practice-note">
+              ${INFO_ICON}
+              <span>Same question types and timing as the real KS2 arithmetic SATs paper, with different numbers &mdash; a full-syllabus check, not tied to just this course. Each one is a single attempt, so make it count.</span>
+            </p>
+          </div>
+        </div>
+      </section>`;
+  }
+
+  function renderActivePanel() {
+    document.getElementById('course-sections').innerHTML = courseSectionHTML(COURSES[activeCourseIndex]);
+  }
+
+  /* ---------------------------------------------------------
+     Progress. Read-only: get_student_progress returns nothing but
+     {slug, status} per test -- no scores, no answers. The list is
+     rendered FIRST and decorated afterwards, so a slow or failed
+     lookup never stops anyone opening a test.
+     --------------------------------------------------------- */
+  const SUPABASE_URL = 'https://qtclbjvxfyrkheyycyzp.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF0Y2xianZ4Znlya2hleXljeXpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY0NTg4NjMsImV4cCI6MjEwMjAzNDg2M30.guo6XSaSZML0DAV0HA1YtZ-QLdw2J3Xms8HflTBSePI';
+
+  let _sb = null;
+  function getClient() {
+    if (_sb) return _sb;
+    if (typeof supabase === 'undefined') return null;
+    _sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    return _sb;
+  }
+
+  const TICK = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>';
+  const CLOCK = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>';
+  const LOCK = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M7 10V7a5 5 0 0 1 10 0v3"/></svg>';
+
+  async function loadProgress(email) {
+    const client = getClient();
+    if (!client) { console.warn('Backend unavailable — showing tests without progress.'); return null; }
+    try {
+      const { data, error } = await client.rpc('get_student_progress', { p_email: email });
+      if (error) { console.warn('Progress lookup failed', error); return null; }
+      const map = {};
+      (data || []).forEach(r => { if (r && r.slug) map[r.slug] = r.status; });
+      return map;
+    } catch (e) {
+      console.warn('Progress lookup error', e);
+      return null;
+    }
+  }
+
+  /* Summary counts across ALL courses regardless of which tab is open,
+     so it is computed straight from the data model rather than the DOM. */
+  function computeSummary(map) {
+    if (!map) return;
+    let done = 0, total = 0;
+    COURSES.forEach(c => {
+      c.tests.forEach(([, slug]) => {
+        total++;
+        if (map[slug] === 'submitted') done++;
+      });
+      if (c.courseTest) {
+        total++;
+        if (map[c.courseTest[0]] === 'submitted') done++;
+      }
+    });
+    FULL_TESTS.forEach(([slug]) => {
+      total++;
+      if (map[slug] === 'submitted') done++;
+    });
+    const box = document.getElementById('summary');
+    document.getElementById('summary-done').textContent = done;
+    document.getElementById('summary-total').textContent = total;
+    document.getElementById('summary-bar').style.width =
+      total ? (done / total * 100) + '%' : '0%';
+    box.classList.remove('hidden');
+  }
+
+  /* Decorates only the cards currently on screen — called again on every tab switch. */
+  function decoratePanel(map) {
+    if (!map) return;
+    document.querySelectorAll('#course-sections .test-card[data-slug]').forEach(card => {
+      const status = map[card.dataset.slug];
+      card.classList.remove('done', 'resume');
+      const old = card.querySelector('.status');
+      if (old) old.remove();
+
+      if (status === 'submitted') {
+        card.classList.add('done');
+        card.insertAdjacentHTML('beforeend',
+          `<span class="status done">${TICK} Completed</span>`);
+      } else if (status === 'in_progress') {
+        card.classList.add('resume');
+        card.insertAdjacentHTML('beforeend',
+          `<span class="status resume">${CLOCK} Resume</span>`);
+      }
+    });
+
+    /* Course test lock: mirrors the server-side rule in start_or_resume_attempt
+       (a course test cannot be started until every module test in that course
+       has been submitted). This is a UX affordance only — the actual gate is
+       enforced in the database, so this can never be bypassed by editing the page. */
+    const course = COURSES[activeCourseIndex];
+    const featureCard = document.querySelector('#course-sections .test-card.feature');
+    if (course && course.courseTest && featureCard &&
+        !featureCard.classList.contains('done') && !featureCard.classList.contains('resume')) {
+      const total = course.tests.length;
+      const done = course.tests.filter(([, slug]) => map[slug] === 'submitted').length;
+      if (done < total) {
+        featureCard.classList.add('locked');
+        featureCard.removeAttribute('href');
+        featureCard.setAttribute('aria-disabled', 'true');
+        const arrow = featureCard.querySelector('.arrow');
+        if (arrow) arrow.remove();
+        const old = featureCard.querySelector('.status');
+        if (old) old.remove();
+        featureCard.insertAdjacentHTML('beforeend',
+          `<span class="status locked">${LOCK} ${done} of ${total} modules done</span>`);
+      }
+    }
+
+    /* Full arithmetic test lock: mirrors the server-side rule for test_type='full'
+       in start_or_resume_attempt -- gated behind EVERY module test across ALL
+       4 courses, not just the active tab's. Same UX-affordance-only caveat as above. */
+    const allModulesTotal = COURSES.reduce((sum, cc) => sum + cc.tests.length, 0);
+    const allModulesDone = COURSES.reduce((sum, cc) =>
+      sum + cc.tests.filter(([, slug]) => map[slug] === 'submitted').length, 0);
+    if (allModulesDone < allModulesTotal) {
+      document.querySelectorAll('#course-sections .test-card[data-slug^="full-arithmetic-"]').forEach(card => {
+        if (card.classList.contains('done') || card.classList.contains('resume')) return;
+        card.classList.add('locked');
+        card.removeAttribute('href');
+        card.setAttribute('aria-disabled', 'true');
+        const arrow = card.querySelector('.arrow');
+        if (arrow) arrow.remove();
+        const old = card.querySelector('.status');
+        if (old) old.remove();
+        card.insertAdjacentHTML('beforeend',
+          `<span class="status locked">${LOCK} ${allModulesDone} of ${allModulesTotal} modules done</span>`);
+      });
+    }
+  }
+
+  function showList(student) {
+    document.getElementById('login-view').style.display = 'none';
+    document.getElementById('list-view').style.display = 'block';
+    document.getElementById('whoami-name').textContent = student.name;
+    document.getElementById('whoami-email').textContent = student.email;
+    document.getElementById('whoami-initials').textContent = initials(student.name);
+    renderTabs();
+    renderActivePanel();
+    loadProgress(student.email).then(map => {
+      progressMap = map;
+      computeSummary(map);
+      decoratePanel(map);
+    });
+  }
+
+  function showLogin() {
+    document.getElementById('list-view').style.display = 'none';
+    document.getElementById('login-view').style.display = 'block';
+  }
+
+  document.getElementById('login-form').addEventListener('submit', e => {
+    e.preventDefault();
+    const name = document.getElementById('in-name').value.trim();
+    const email = document.getElementById('in-email').value.trim();
+    const err = document.getElementById('form-error');
+    const emailLooksOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    if (!name || !emailLooksOk) {
+      err.style.display = 'block';
+      (!name ? document.getElementById('in-name') : document.getElementById('in-email')).focus();
+      return;
+    }
+    err.style.display = 'none';
+    const student = { name, email };
+    sessionStorage.setItem('s2s_student', JSON.stringify(student));
+    showList(student);
+    window.scrollTo({ top: 0 });
+  });
+
+  function logOut() {
+    sessionStorage.removeItem('s2s_student');
+    document.getElementById('in-name').value = '';
+    document.getElementById('in-email').value = '';
+    showLogin();
+    window.scrollTo({ top: 0 });
+  }
+  document.getElementById('logout-link').addEventListener('click', logOut);
+  document.getElementById('logout-link').addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); logOut(); }
+  });
+
+  // Already identified earlier this visit (e.g. back from a test)? Skip the form.
+  (function init() {
+    try {
+      const saved = JSON.parse(sessionStorage.getItem('s2s_student') || 'null');
+      if (saved && saved.name && saved.email) { showList(saved); return; }
+    } catch (e) { /* malformed storage, fall through to login */ }
+    showLogin();
+  })();
+</script>
+
+</body>
+</html>
