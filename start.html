@@ -809,6 +809,16 @@
     },
   ];
 
+  /* Full arithmetic tests: whole-syllabus SATs-style papers (36 Qs / 40 marks / 30 min,
+     one attempt, gated behind ALL 19 module tests across every course). Shared content --
+     identical in every course tab, positioned below that course's Course Test. */
+  const FULL_TESTS = [
+    ['full-arithmetic-2026', 'Full Arithmetic Test — 2026'],
+    ['full-arithmetic-2025', 'Full Arithmetic Test — 2025'],
+    ['full-arithmetic-2024', 'Full Arithmetic Test — 2024'],
+    ['full-arithmetic-2023', 'Full Arithmetic Test — 2023'],
+  ];
+
   const ARROW = '<svg class="arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>';
   const INFO_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>';
 
@@ -881,6 +891,13 @@
         </a>`;
     }
 
+    const fullTestCards = FULL_TESTS.map(([slug, title]) => `<a class="test-card feature" data-slug="${esc(slug)}" href="${esc(slug)}.html">
+          <span class="n">Full Test</span>
+          <span class="t">${esc(title)}</span>
+          <span class="q">36 questions &middot; 40 marks &middot; 30 min</span>
+          ${ARROW}
+        </a>`).join('');
+
     const totalQs = c.tests.reduce((a, t) => a + t[3], 0);
     const cardCount = c.tests.length + (c.courseTest ? 1 : 0) + (c.practiceTest ? 1 : 0);
     const label = cardCount === 1 ? '1 test' : `${cardCount} tests`;
@@ -912,7 +929,7 @@
             ${practiceTestCard}
             <p class="practice-note">
               ${INFO_ICON}
-              <span><strong>Practice as many times as you want</strong> before you do the course test. Course tests can only be completed once!</span>
+              <span><strong>Practice up to 5 times</strong> before completing the actual test. Course tests can only be completed once!</span>
             </p>
           </div>` : ''}
           ${c.courseTest ? `<div class="section-group">
@@ -923,6 +940,18 @@
             </div>
             ${courseTestCard}
           </div>` : ''}
+          <div class="section-group">
+            <div class="section-label">
+              <span class="txt">Full Arithmetic Tests</span>
+              <span class="rule"></span>
+              <span class="hint">Sit once every module is done, across all 4 courses</span>
+            </div>
+            <div class="test-grid">${fullTestCards}</div>
+            <p class="practice-note">
+              ${INFO_ICON}
+              <span>Same question types and timing as the real KS2 arithmetic SATs paper, with different numbers &mdash; a full-syllabus check, not tied to just this course. Each one is a single attempt, so make it count.</span>
+            </p>
+          </div>
         </div>
       </section>`;
   }
@@ -982,6 +1011,10 @@
         if (map[c.courseTest[0]] === 'submitted') done++;
       }
     });
+    FULL_TESTS.forEach(([slug]) => {
+      total++;
+      if (map[slug] === 'submitted') done++;
+    });
     const box = document.getElementById('summary');
     document.getElementById('summary-done').textContent = done;
     document.getElementById('summary-total').textContent = total;
@@ -1031,6 +1064,27 @@
         featureCard.insertAdjacentHTML('beforeend',
           `<span class="status locked">${LOCK} ${done} of ${total} modules done</span>`);
       }
+    }
+
+    /* Full arithmetic test lock: mirrors the server-side rule for test_type='full'
+       in start_or_resume_attempt -- gated behind EVERY module test across ALL
+       4 courses, not just the active tab's. Same UX-affordance-only caveat as above. */
+    const allModulesTotal = COURSES.reduce((sum, cc) => sum + cc.tests.length, 0);
+    const allModulesDone = COURSES.reduce((sum, cc) =>
+      sum + cc.tests.filter(([, slug]) => map[slug] === 'submitted').length, 0);
+    if (allModulesDone < allModulesTotal) {
+      document.querySelectorAll('#course-sections .test-card[data-slug^="full-arithmetic-"]').forEach(card => {
+        if (card.classList.contains('done') || card.classList.contains('resume')) return;
+        card.classList.add('locked');
+        card.removeAttribute('href');
+        card.setAttribute('aria-disabled', 'true');
+        const arrow = card.querySelector('.arrow');
+        if (arrow) arrow.remove();
+        const old = card.querySelector('.status');
+        if (old) old.remove();
+        card.insertAdjacentHTML('beforeend',
+          `<span class="status locked">${LOCK} ${allModulesDone} of ${allModulesTotal} modules done</span>`);
+      });
     }
   }
 

@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Full Arithmetic Test — 2026 | Steps 2 Success</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,600;0,700;1,700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: #F4F5FB;
+      color: #0D0D0D;
+      min-height: 100vh;
+    }
+
+    header {
+      background: #0D0080;
+      color: white;
+      padding: 18px 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    header img { height: 48px; }
+    header h1  { font-family: 'Fraunces', serif; font-size: 1.3rem; font-weight: 700; }
+    header p   { font-size: 0.85rem; color: #5EDDE0; margin-top: 2px; }
+
+    .container {
+      max-width: 720px;
+      margin: 32px auto;
+      padding: 0 16px 60px;
+    }
+
+    .details-bar {
+      background: white;
+      border-radius: 10px;
+      padding: 20px 24px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      margin-bottom: 24px;
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      align-items: flex-end;
+    }
+    .details-bar .field { flex: 1; min-width: 180px; }
+    .details-bar label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #0D0080;
+      margin-bottom: 5px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .details-bar input {
+      width: 100%;
+      padding: 9px 12px;
+      border: 2px solid #ccd3dc;
+      border-radius: 6px;
+      font-size: 0.97rem;
+      transition: border-color 0.2s;
+    }
+    .details-bar input:focus { outline: none; border-color: #5EDDE0; }
+    .details-bar input.filled { border-color: #5EDDE0; background: #E0F9FA; }
+
+    .disclaimer {
+      background: #D6D2FF;
+      border-left: 4px solid #0D0080;
+      border-radius: 6px;
+      padding: 12px 16px;
+      margin-bottom: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .disclaimer p { font-size: 0.88rem; color: #333; line-height: 1.5; }
+
+    .timer-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      background: white; border-radius: 10px; padding: 12px 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 18px;
+    }
+    .timer-label { font-size: 0.82rem; font-weight: 700; color: #0D0080; text-transform: uppercase; letter-spacing: 0.04em; }
+    .timer-value { font-family: 'Fraunces', serif; font-size: 1.5rem; font-weight: 700; color: #0D0080; }
+    .timer-value.warning { color: #E24B4A; }
+    .timer-paused-note { font-size: 0.78rem; color: #4A4A4A; font-style: italic; }
+
+    .progress-bar-wrap {
+      background: #dde3ea;
+      border-radius: 99px;
+      height: 8px;
+      margin-bottom: 24px;
+      overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: #E8B800;
+      border-radius: 99px;
+      transition: width 0.3s;
+      width: 0%;
+    }
+
+    .question-card {
+      background: white;
+      border-radius: 10px;
+      padding: 28px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      margin-bottom: 16px;
+    }
+    .question-meta {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #2AB8BC;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 10px;
+      display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+    }
+    .q-chip {
+      display: inline-block; padding: 3px 10px; border-radius: 99px;
+      background: #E0F9FA; color: #1F9296; border: 1px solid #BCE9EA;
+      font-size: 0.72rem; letter-spacing: 0.03em;
+    }
+    .q-chip-skill { background: #FFF8CC; color: #7A6000; border-color: #F0DE8A; }
+    .question-text {
+      font-family: 'Fraunces', serif;
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #0D0080;
+      margin-bottom: 18px;
+    }
+    .answer-input {
+      width: 100%;
+      max-width: 280px;
+      padding: 10px 14px;
+      border: 2px solid #4A4A4A;
+      border-radius: 6px;
+      font-size: 1.1rem;
+      transition: border-color 0.2s;
+    }
+    .answer-input:focus { outline: none; border-color: #4A4A4A; }
+    .marks-note { margin-top: 10px; font-size: 0.82rem; color: #4A4A4A; }
+
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 20px;
+    }
+    .q-counter { font-size: 0.9rem; color: #4A4A4A; }
+
+    .btn {
+      display: inline-block;
+      padding: 11px 28px;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+    }
+    .btn:active:not(:disabled) { transform: scale(0.97); }
+    .btn-primary   { background: #E8B800; color: #0D0D0D; }
+    .btn-secondary { background: #5EDDE0; color: #0D0D0D; }
+    .btn-outline   { background: white; color: #0D0080; border: 2px solid #0D0080; }
+    .btn:disabled  { opacity: 0.35; cursor: not-allowed; }
+
+    #review-screen { display: none; }
+    .review-header {
+      background: white;
+      border-radius: 10px;
+      padding: 24px 28px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      margin-bottom: 20px;
+    }
+    .review-header h2 { font-family: 'Fraunces', serif; color: #0D0080; margin-bottom: 6px; }
+    .review-header p  { color: #4A4A4A; font-size: 0.95rem; }
+
+    .review-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      margin-bottom: 24px;
+    }
+    .review-table th {
+      background: #0D0080;
+      color: white;
+      padding: 12px 16px;
+      text-align: left;
+      font-size: 0.88rem;
+    }
+    .review-table td {
+      padding: 12px 16px;
+      border-bottom: 1px solid #eef1f5;
+      font-size: 0.93rem;
+    }
+    .review-table tr:last-child td { border-bottom: none; }
+    .review-table tr:nth-child(even) td { background: #f8fafc; }
+
+    .blank-warning {
+      background: #fff3cd;
+      border: 1px solid #ffc107;
+      border-radius: 8px;
+      padding: 14px 18px;
+      margin-bottom: 20px;
+      font-size: 0.92rem;
+      color: #856404;
+    }
+    .blank-warning strong { display: block; margin-bottom: 4px; }
+
+    #result-screen { display: none; }
+    .result-card {
+      background: white;
+      border-radius: 10px;
+      padding: 36px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      text-align: center;
+    }
+    .result-card h2 { font-family: 'Fraunces', serif; color: #0D0080; font-size: 1.5rem; margin-bottom: 8px; }
+    .result-name    { font-size: 1.1rem; color: #444; margin-bottom: 4px; }
+    .score-display  { font-family: 'Fraunces', serif; font-size: 3.5rem; font-weight: 800; color: #0D0080; margin: 16px 0 4px; }
+    .score-label    { color: #4A4A4A; font-size: 0.95rem; }
+
+    .breakdown-note {
+      margin-top: 24px; text-align: left;
+    }
+    .breakdown-note h3 {
+      font-family: 'Fraunces', serif; color: #0D0080; font-size: 1.05rem; margin-bottom: 12px;
+    }
+    .breakdown-row {
+      display: flex; align-items: center; gap: 12px; margin-bottom: 12px;
+    }
+    .breakdown-label { flex: 0 0 210px; font-size: 0.88rem; color: #333; font-weight: 500; }
+    .breakdown-bar-wrap { flex: 1; background: #dde3ea; border-radius: 99px; height: 10px; overflow: hidden; }
+    .breakdown-bar-fill { display: block; height: 100%; border-radius: 99px; }
+    .breakdown-score { flex: 0 0 auto; font-size: 0.85rem; font-weight: 700; color: #0D0080; min-width: 100px; text-align: right; }
+    .breakdown-hint {
+      margin-top: 16px; padding: 12px 16px; border-radius: 8px;
+      background: #E0F9FA; border: 1px solid #BCE9EA; color: #1F5B5D;
+      font-size: 0.88rem; line-height: 1.5;
+    }
+
+    .results-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 24px;
+      background: white;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    .results-table th {
+      background: #0D0080;
+      color: white;
+      padding: 12px 16px;
+      text-align: left;
+      font-size: 0.88rem;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .results-table td {
+      padding: 12px 16px;
+      border-bottom: 1px solid #eef1f5;
+      font-size: 0.93rem;
+      vertical-align: middle;
+    }
+    .results-table tr:last-child td { border-bottom: none; }
+    .results-table tr:nth-child(even) td { background: #f8fafc; }
+    .tick  { color: #27C47A; font-size: 1.2rem; font-weight: 700; }
+    .cross { color: #E24B4A; font-size: 1.2rem; font-weight: 700; }
+
+    #locked-screen, #modules-incomplete-screen {
+      display: none;
+      background: white;
+      border-radius: 10px;
+      padding: 48px 32px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      text-align: center;
+    }
+    #locked-screen h2, #modules-incomplete-screen h2 { font-family: 'Fraunces', serif; color: #0D0080; margin-bottom: 12px; }
+    #locked-screen p, #modules-incomplete-screen p  { color: #4A4A4A; font-size: 0.95rem; line-height: 1.6; }
+    .lock-icon { font-size: 3rem; margin-bottom: 16px; }
+    #modules-incomplete-screen .btn-outline {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 11px 26px;
+      border: 2px solid #0D0080;
+      border-radius: 6px;
+      color: #0D0080;
+      font-weight: 700;
+      font-size: 0.95rem;
+      text-decoration: none;
+    }
+
+    .overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+    }
+    .overlay.active { display: flex; }
+    .popup {
+      background: white;
+      border-radius: 12px;
+      padding: 32px;
+      max-width: 420px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+    }
+    .popup h3 { font-family: 'Fraunces', serif; color: #0D0080; margin-bottom: 12px; font-size: 1.2rem; }
+    .popup p  { color: #4A4A4A; margin-bottom: 24px; font-size: 0.95rem; line-height: 1.5; }
+    .popup-buttons { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+    .spinner {
+      display: inline-block;
+      width: 20px; height: 20px;
+      border: 3px solid rgba(255,255,255,0.4);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .details-bar input[readonly] { background:#E0F9FA; border-color:#5EDDE0; cursor:default; }
+    .finish-bar { display:flex; gap:12px; flex-wrap:wrap; margin-top:20px; }
+
+    #not-you-link {
+      flex-basis:100%; display:inline-flex; align-items:center; gap:6px;
+      font-size:0.81rem; font-weight:500; color:#4A4A4A;
+      text-decoration:none; cursor:pointer; margin-top:2px;
+    }
+    #not-you-link:hover { color:#0D0080; text-decoration:underline; }
+
+    .back-link {
+      font-size:0.83rem; font-weight:500; color:#5EDDE0;
+      text-decoration:none; margin-right: 8px;
+    }
+    .back-link:hover { color: white; }
+
+    @media (max-width:620px) {
+      .question-text { font-size: 1.15rem; }
+      .answer-input { max-width: 100%; }
+      .timer-value { font-size: 1.25rem; }
+      .breakdown-label { flex-basis: 140px; font-size: 0.8rem; }
+      .breakdown-score { min-width: 80px; font-size: 0.78rem; }
+    }
+
+  </style>
+</head>
+<body>
+
+<header>
+  <a class="back-link" href="start.html">All tests</a>
+  <a class="home-link" href="start.html" aria-label="Back to all tests" title="Back to all tests"><img src="logo_cropped.png" alt="Steps 2 Success" /></a>
+  <div>
+    <h1>Full Arithmetic Test — 2026</h1>
+    <p>Full Arithmetic Test &middot; 30 minutes</p>
+  </div>
+</header>
+
+<div class="container">
+
+  <div id="locked-screen">
+    <div class="lock-icon">🔒</div>
+    <h2>Test already submitted</h2>
+    <p>This test has already been completed and cannot be taken again.<br>Please speak to your teacher if you think this is a mistake.</p>
+  </div>
+
+  <div id="modules-incomplete-screen">
+    <div class="lock-icon">📚</div>
+    <h2>Finish every module test first</h2>
+    <p>The full arithmetic tests unlock once every module test across all four courses has been completed &mdash; they cover every topic, so they're a full-course check.<br>
+       You still have <strong id="incomplete-count">some module tests</strong> left to finish.</p>
+    <a class="btn-outline" href="start.html">Back to your tests</a>
+  </div>
+
+  <div id="quiz-screen">
+
+    <div class="details-bar">
+      <div class="field">
+        <label for="student-name">Full name</label>
+        <input type="text" id="student-name" placeholder="e.g. Alex Smith" autocomplete="off" oninput="onDetailsInput()" />
+      </div>
+      <div class="field">
+        <label for="student-email">Email address</label>
+        <input type="email" id="student-email" placeholder="e.g. alex@email.com" autocomplete="off" oninput="onDetailsInput()" />
+      </div>
+    </div>
+
+    <div class="disclaimer">
+      <p>&#9432; For large numbers, commas are optional but you cannot use a space.<br>Write <strong>2123</strong> or <strong>2,123</strong> — not <strong>2 123</strong>.</p>
+      <p>&#9432; If you don't know the answer, enter <strong>X</strong> and move on (not case-sensitive).</p>
+      <p>&#9432; Give fraction answers as improper fractions, mixed numbers, or equivalent fractions &mdash; not decimals.</p>
+      <p>&#9432; This test is based on the real KS2 arithmetic SATs paper format &mdash; same question types and timing, different numbers.</p>
+    </div>
+
+    <div class="timer-bar">
+      <span class="timer-label">Time remaining</span>
+      <span class="timer-value" id="timer-value">30:00</span>
+      <span class="timer-paused-note" id="timer-paused-note" style="display:none">Paused while this tab is in the background</span>
+    </div>
+
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" id="progress-fill"></div>
+    </div>
+
+    <div id="question-area"></div>
+
+    <div class="nav">
+      <button class="btn btn-outline" id="btn-prev" onclick="goTo(currentQ - 1)">← Back</button>
+      <span class="q-counter" id="q-counter"></span>
+      <button class="btn btn-secondary" id="btn-next" onclick="nextOrReview()" disabled>Next →</button>
+    </div>
+
+  </div>
+
+  <div id="review-screen">
+    <div class="review-header">
+      <h2>Review your answers</h2>
+      <p>Check everything looks right. Enter X for any question you want to leave blank — you cannot submit with empty answers.</p>
+    </div>
+    <div id="blank-warning" class="blank-warning" style="display:none">
+      <strong>Empty answers found</strong>
+      Enter X in any question you are leaving blank before submitting.
+    </div>
+    <table class="review-table">
+      <thead>
+        <tr><th>Question</th><th>Your answer</th></tr>
+      </thead>
+      <tbody id="review-body"></tbody>
+    </table>
+    <div style="display:flex; gap:12px; flex-wrap:wrap;">
+      <button class="btn btn-outline" onclick="showQuiz()">Go back and edit</button>
+      <button class="btn btn-primary" id="btn-submit" onclick="confirmSubmit()">Submit test</button>
+    </div>
+  </div>
+
+  <div id="result-screen">
+    <div class="result-card">
+      <h2>Test complete!</h2>
+      <p class="result-name" id="result-name"></p>
+      <div class="score-display" id="score-display"></div>
+      <p class="score-label" id="score-label"></p>
+      <div class="breakdown-note">
+        <h3>Your score by topic</h3>
+        <div id="breakdown-rows"></div>
+        <p class="breakdown-hint">This shows exactly where your gaps still are &mdash; a low score in one area is a good sign of where to focus next, whether that's revisiting the lessons or trying a course practice test.</p>
+      </div>
+    </div>
+    <table class="results-table">
+      <thead>
+        <tr>
+          <th>Question</th>
+          <th>Your answer</th>
+          <th>Result</th>
+        </tr>
+      </thead>
+      <tbody id="results-body"></tbody>
+    </table>
+    <div class="finish-bar" id="result-buttons">
+      <button class="btn btn-outline" onclick="finishAndClose()">Back to your tests</button>
+    </div>
+  </div>
+
+</div>
+
+<div class="overlay" id="popup-confirm">
+  <div class="popup">
+    <h3>Ready to submit?</h3>
+    <p>Once you submit, your answers are final and you cannot retake this test unless your teacher unlocks another attempt.</p>
+    <div class="popup-buttons">
+      <button class="btn btn-outline" onclick="closePopup('popup-confirm')">Go back</button>
+      <button class="btn btn-primary" id="btn-confirm-submit" onclick="submitTest(false)">Yes, submit</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const questions = [
+    { num: 'Q1', course: "Addition & Subtraction", text: "77 + 209 =", answers: ["286", "286"], points: 1 },
+    { num: 'Q2', course: "Addition & Subtraction", text: "3,095 + 684 + 99 =", answers: ["3878", "3,878"], points: 1 },
+    { num: 'Q3', course: "Multiplication & Division", text: "28 ÷ 1 =", answers: ["28"], points: 1 },
+    { num: 'Q4', course: "Multiplication & Division", text: "3 × 10 =", answers: ["30", "30"], points: 1 },
+    { num: 'Q5', course: "Addition & Subtraction", text: "4,759 − 2,178 =", answers: ["2581", "2,581"], points: 1 },
+    { num: 'Q6', course: "Multiplication & Division", text: "72 ÷ 8 =", answers: ["9", "9"], points: 1 },
+    { num: 'Q7', course: "Addition & Subtraction", text: "___ = 7,170 − 1,706", answers: ["5464", "5,464"], points: 1 },
+    { num: 'Q8', course: "Multiplication & Division", text: "208 ÷ 8 =", answers: ["26", "26"], points: 1 },
+    { num: 'Q9', course: "Addition & Subtraction", text: "6,628 − 23 =", answers: ["6605", "6,605"], points: 1 },
+    { num: 'Q10', course: "Addition & Subtraction", text: "5,090,601 = 5,000,000 + ___ + 600 + 1", answers: ["90000", "90,000"], points: 1 },
+    { num: 'Q11', course: "Fractions", text: "3/5 + 1/5 + 2/5 =", answers: ["1 1/5", "6/5", "1.2"], points: 1 },
+    { num: 'Q12', course: "Multiplication & Division", text: "2,718 ÷ 9 =", answers: ["302", "302"], points: 1 },
+    { num: 'Q13', course: "Decimals & Percentages", text: "41.9 + 7.035 =", answers: ["48.935"], points: 1 },
+    { num: 'Q14', course: "Multiplication & Division", text: "329 ÷ 7 =", answers: ["47", "47"], points: 1 },
+    { num: 'Q15', course: "Multiplication & Division", text: "27 × 6 =", answers: ["162", "162"], points: 1 },
+    { num: 'Q16', course: "Fractions", text: "1/5 × 1/9 =", answers: ["1/45", "2/90", "0.0222"], points: 1 },
+    { num: 'Q17', course: "Fractions", text: "1/2 of 554 =", answers: ["277"], points: 1 },
+    { num: 'Q18', course: "Multiplication & Division", text: "66 ÷ ___ = 11", answers: ["6"], points: 1 },
+    { num: 'Q19', course: "Fractions", text: "3/5 − 2/5 =", answers: ["1/5", "2/10", "0.2"], points: 1 },
+    { num: 'Q20', course: "Multiplication & Division", text: "818 × 25 =", answers: ["20450", "20,450"], points: 2 },
+    { num: 'Q21', course: "Multiplication & Division", text: "9,271 × 1,000 =", answers: ["9271000", "9,271,000"], points: 1 },
+    { num: 'Q22', course: "Decimals & Percentages", text: "83.5 − 37.83 =", answers: ["45.67"], points: 1 },
+    { num: 'Q23', course: "Decimals & Percentages", text: "686.7 ÷ 100 =", answers: ["6.867"], points: 1 },
+    { num: 'Q24', course: "Decimals & Percentages", text: "6 × 91.94 =", answers: ["551.64"], points: 1 },
+    { num: 'Q25', course: "Multiplication & Division", text: "1,744 ÷ 8 =", answers: ["218"], points: 2 },
+    { num: 'Q26', course: "Fractions", text: "2/4 ÷ 3 =", answers: ["1/6", "2/12", "0.1667"], points: 1 },
+    { num: 'Q27', course: "Multiplication & Division", text: "8,212 × 74 =", answers: ["607688", "607,688"], points: 2 },
+    { num: 'Q28', course: "Decimals & Percentages", text: "30% of 2,800 =", answers: ["840", "840"], points: 1 },
+    { num: 'Q29', course: "Addition & Subtraction", text: "69 − 4³ =", answers: ["5"], points: 1 },
+    { num: 'Q30', course: "Decimals & Percentages", text: "97% of 700 =", answers: ["679", "679"], points: 1 },
+    { num: 'Q31', course: "Multiplication & Division", text: "2,376 ÷ 12 =", answers: ["198"], points: 2 },
+    { num: 'Q32', course: "Fractions", text: "1 3/4 + 1 1/8 =", answers: ["2 7/8", "23/8", "2.875"], points: 1 },
+    { num: 'Q33', course: "Decimals & Percentages", text: "11 × 55.63 =", answers: ["611.93"], points: 1 },
+    { num: 'Q34', course: "Decimals & Percentages", text: "65% of 600 =", answers: ["390", "390"], points: 1 },
+    { num: 'Q35', course: "Fractions", text: "3 3/4 − 2 4/5 =", answers: ["19/20", "38/40", "0.95"], points: 1 },
+    { num: 'Q36', course: "Fractions", text: "2 1/2 × 57 =", answers: ["142 1/2", "285/2", "142.5"], points: 1 }
+  ];
+
+  const SUPABASE_URL = 'https://qtclbjvxfyrkheyycyzp.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF0Y2xianZ4Znlya2hleXljeXpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY0NTg4NjMsImV4cCI6MjEwMjAzNDg2M30.guo6XSaSZML0DAV0HA1YtZ-QLdw2J3Xms8HflTBSePI';
+  const TEST_SLUG = 'full-arithmetic-2026';
+  const TIMER_SECONDS_TOTAL = 1800;
+  const PORTAL_URL = 'start.html';
+  const COURSE_ORDER = ["Addition & Subtraction", "Multiplication & Division", "Fractions", "Decimals & Percentages"];
+  const COURSE_COLOURS = {
+    'Addition & Subtraction': '#2AB8BC',
+    'Multiplication & Division': '#3D2FC4',
+    'Fractions': '#E8B800',
+    'Decimals & Percentages': '#E24B4A',
+  };
+
+  let _sb = null;
+  function getClient() {
+    if (_sb) return _sb;
+    if (typeof supabase === 'undefined') return null;
+    _sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    return _sb;
+  }
+
+  let currentQ = 0;
+  let userAnswers = new Array(questions.length).fill('');
+  let attemptStarted = false;
+  let statusCheckInFlight = false;
+  let timeRemaining = TIMER_SECONDS_TOTAL;
+  let timerInterval = null;
+  let timerRunning = false;
+  let autoSubmitted = false;
+
+  window.addEventListener('DOMContentLoaded', () => {
+    prefillFromPortal();
+    showScreen('quiz-screen');
+    renderQuestion();
+    updateTimerDisplay();
+  });
+
+  function prefillFromPortal() {
+    let saved;
+    try { saved = JSON.parse(sessionStorage.getItem('s2s_student') || 'null'); }
+    catch (e) { saved = null; }
+    if (!saved || !saved.name || !saved.email) return;
+    const nameEl  = document.getElementById('student-name');
+    const emailEl = document.getElementById('student-email');
+    if (!nameEl || !emailEl) return;
+    nameEl.value = saved.name;
+    emailEl.value = saved.email;
+    nameEl.readOnly = true;
+    emailEl.readOnly = true;
+    onDetailsInput();
+    injectNotYouLink();
+  }
+
+  function injectNotYouLink() {
+    const bar = document.querySelector('.details-bar');
+    if (!bar || document.getElementById('not-you-link')) return;
+    const link = document.createElement('a');
+    link.id = 'not-you-link';
+    link.href = '#';
+    link.textContent = 'Not you? Clear and re-enter your details';
+    link.addEventListener('click', e => {
+      e.preventDefault();
+      sessionStorage.removeItem('s2s_student');
+      const nameEl  = document.getElementById('student-name');
+      const emailEl = document.getElementById('student-email');
+      nameEl.readOnly = false;
+      emailEl.readOnly = false;
+      nameEl.value = '';
+      emailEl.value = '';
+      nameEl.classList.remove('filled');
+      emailEl.classList.remove('filled');
+      link.remove();
+      nameEl.focus();
+    });
+    bar.appendChild(link);
+  }
+
+  window.addEventListener('beforeunload', e => {
+    const inProgress = document.getElementById('quiz-screen').style.display !== 'none'
+                    || document.getElementById('review-screen').style.display !== 'none';
+    if (inProgress) { e.preventDefault(); e.returnValue = ''; }
+  });
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      stopTimer();
+      const note = document.getElementById('timer-paused-note');
+      if (note) note.style.display = 'inline';
+    } else {
+      const note = document.getElementById('timer-paused-note');
+      if (note) note.style.display = 'none';
+      if (attemptStarted && !autoSubmitted) startTimer();
+    }
+  });
+
+  function startTimer() {
+    if (timerRunning) return;
+    timerRunning = true;
+    timerInterval = setInterval(() => {
+      timeRemaining = Math.max(0, timeRemaining - 1);
+      updateTimerDisplay();
+      if (timeRemaining % 15 === 0) autosave();
+      if (timeRemaining <= 0) {
+        stopTimer();
+        handleTimeUp();
+      }
+    }, 1000);
+  }
+
+  function stopTimer() {
+    timerRunning = false;
+    if (timerInterval) clearInterval(timerInterval);
+    timerInterval = null;
+  }
+
+  function updateTimerDisplay() {
+    const el = document.getElementById('timer-value');
+    if (!el) return;
+    const m = Math.floor(timeRemaining / 60);
+    const s = timeRemaining % 60;
+    el.textContent = `${m}:${String(s).padStart(2, '0')}`;
+    el.classList.toggle('warning', timeRemaining <= 300);
+  }
+
+  function handleTimeUp() {
+    if (autoSubmitted) return;
+    autoSubmitted = true;
+    saveCurrentAnswer();
+    submitTest(true);
+  }
+
+  function onDetailsInput() {
+    const nameEl  = document.getElementById('student-name');
+    const emailEl = document.getElementById('student-email');
+    nameEl.classList.toggle('filled', !!nameEl.value.trim());
+    emailEl.classList.toggle('filled', !!emailEl.value.trim());
+    maybeCheckStatus();
+  }
+
+  function getDetails() {
+    return {
+      name : document.getElementById('student-name').value.trim(),
+      email: document.getElementById('student-email').value.trim(),
+    };
+  }
+
+  let statusDebounce;
+  function maybeCheckStatus() {
+    clearTimeout(statusDebounce);
+    statusDebounce = setTimeout(checkStatus, 500);
+  }
+
+  async function checkStatus() {
+    const { name, email } = getDetails();
+    if (!name || !email || !email.includes('@') || statusCheckInFlight || attemptStarted) return;
+    const client = getClient();
+    if (!client) { console.warn('Backend unavailable — cannot verify attempt status yet.'); return; }
+    statusCheckInFlight = true;
+    try {
+      const { data, error } = await client.rpc('start_or_resume_attempt', {
+        p_test_slug: TEST_SLUG, p_first_name: name.split(' ')[0] || name,
+        p_last_name: name.split(' ').slice(1).join(' ') || '-', p_email: email,
+      });
+      if (error) { console.warn('status check error', error); return; }
+      if (data.status === 'locked') {
+        showScreen('locked-screen');
+      } else if (data.status === 'modules_incomplete') {
+        const n = data.incomplete_count || 0;
+        const el = document.getElementById('incomplete-count');
+        if (el) el.textContent = n === 1 ? '1 module test' : `${n} module tests`;
+        showScreen('modules-incomplete-screen');
+      } else if (data.status === 'resumed') {
+        attemptStarted = true;
+        userAnswers = (data.answers || []).length ? data.answers.map(a => a.userAnswer || '') : userAnswers;
+        currentQ = Math.min(data.current_question_index || 0, questions.length - 1);
+        if (typeof data.time_remaining_seconds === 'number') timeRemaining = data.time_remaining_seconds;
+        renderQuestion();
+        updateTimerDisplay();
+        if (!document.hidden) startTimer();
+      } else if (data.status === 'started') {
+        attemptStarted = true;
+        if (typeof data.time_remaining_seconds === 'number') timeRemaining = data.time_remaining_seconds;
+        updateTimerDisplay();
+        if (!document.hidden) startTimer();
+      }
+    } catch (err) {
+      console.warn('Could not verify attempt status (offline?)', err);
+    } finally {
+      statusCheckInFlight = false;
+    }
+  }
+
+  function normalise(str) {
+    return str.trim().toLowerCase().replace(/,/g, '').replace(/\s+/g, ' ');
+  }
+  function isCorrect(userAns, acceptedList) {
+    return acceptedList.some(a => normalise(a) === normalise(userAns));
+  }
+
+  function showScreen(id) {
+    ['locked-screen','modules-incomplete-screen','quiz-screen','review-screen','result-screen']
+      .forEach(s => document.getElementById(s).style.display = 'none');
+    document.getElementById(id).style.display = 'block';
+  }
+
+  function showQuiz() {
+    showScreen('quiz-screen');
+    renderQuestion();
+  }
+
+  function autosave() {
+    if (!attemptStarted) return;
+    const { email } = getDetails();
+    if (!email) return;
+    const client = getClient();
+    if (!client) return;
+    const snapshot = questions.map((q, i) => ({ question: q.num, userAnswer: userAnswers[i] || '' }));
+    client.rpc('save_progress', {
+      p_test_slug: TEST_SLUG, p_email: email,
+      p_current_question_index: currentQ, p_answers: snapshot,
+      p_time_remaining_seconds: timeRemaining,
+    }).then(({ error }) => { if (error) console.warn('autosave failed', error); });
+  }
+
+  function renderQuestion() {
+    const q   = questions[currentQ];
+    const pct = ((currentQ + 1) / questions.length) * 100;
+    document.getElementById('progress-fill').style.width = pct + '%';
+    document.getElementById('q-counter').textContent = `Question ${currentQ + 1} of ${questions.length}`;
+    document.getElementById('btn-prev').disabled = currentQ === 0;
+
+    const btnNext = document.getElementById('btn-next');
+    btnNext.textContent = currentQ === questions.length - 1 ? 'Review answers \u2192' : 'Next \u2192';
+
+    document.getElementById('question-area').innerHTML = `
+      <div class="question-card">
+        <div class="question-meta">
+          <span class="q-chip">${q.num}</span>
+          <span class="q-chip q-chip-skill">${q.course}</span>
+          <span class="q-chip">${q.points} mark${q.points > 1 ? 's' : ''}</span>
+        </div>
+        <div class="question-text">${q.text}</div>
+        <input
+          class="answer-input"
+          type="text"
+          id="answer-input"
+          value="${userAnswers[currentQ]}"
+          placeholder="Your answer or X"
+          autocomplete="off"
+          autocorrect="off"
+          spellcheck="false"
+        />
+        <p class="marks-note">If you don't know, enter <strong>X</strong> and move on.</p>
+      </div>
+    `;
+
+    const inp = document.getElementById('answer-input');
+    btnNext.disabled = inp.value.trim() === '';
+
+    inp.addEventListener('input', () => {
+      btnNext.disabled = inp.value.trim() === '';
+    });
+    inp.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && !btnNext.disabled) nextOrReview();
+    });
+    inp.focus();
+  }
+
+  function saveCurrentAnswer() {
+    const el = document.getElementById('answer-input');
+    if (el) userAnswers[currentQ] = el.value.trim();
+  }
+
+  function goTo(index) {
+    saveCurrentAnswer();
+    autosave();
+    currentQ = index;
+    renderQuestion();
+  }
+
+  function nextOrReview() {
+    saveCurrentAnswer();
+    autosave();
+    if (currentQ < questions.length - 1) {
+      currentQ++;
+      renderQuestion();
+    } else {
+      showReview();
+    }
+  }
+
+  function showReview() {
+    showScreen('review-screen');
+    const tbody  = document.getElementById('review-body');
+    tbody.innerHTML = '';
+    let hasBlank = false;
+
+    questions.forEach((q, i) => {
+      const ans = userAnswers[i];
+      if (!ans) hasBlank = true;
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><strong>${q.num}</strong> &nbsp; ${q.text}</td>
+        <td style="color:${ans ? '#222' : '#c00'}; font-weight:${ans ? '400' : '700'}">
+          ${ans || '\u26a0 Empty'}
+        </td>
+      `;
+      tr.style.cursor = 'pointer';
+      tr.title = 'Click to edit';
+      tr.addEventListener('click', () => { showQuiz(); goTo(i); });
+      tbody.appendChild(tr);
+    });
+
+    document.getElementById('blank-warning').style.display = hasBlank ? 'block' : 'none';
+    document.getElementById('btn-submit').disabled = hasBlank;
+  }
+
+  function confirmSubmit() {
+    const { name, email } = getDetails();
+    if (!name || !email) {
+      alert('Please enter your name and email address at the top of the page before submitting.');
+      showQuiz();
+      document.getElementById('student-name').focus();
+      return;
+    }
+    if (userAnswers.some(a => !a)) {
+      document.getElementById('blank-warning').style.display = 'block';
+      return;
+    }
+    document.getElementById('popup-confirm').classList.add('active');
+  }
+
+  function closePopup(id) {
+    document.getElementById(id).classList.remove('active');
+  }
+
+  async function submitTest(timedOut) {
+    timedOut = timedOut === true;
+    const { name, email } = getDetails();
+    const btn = document.getElementById('btn-confirm-submit');
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span>Submitting\u2026';
+    }
+    stopTimer();
+
+    const totalMarks  = questions.reduce((s, q) => s + q.points, 0);
+    let   earnedMarks = 0;
+    const answerDetails = [];
+
+    questions.forEach((q, i) => {
+      const correct = isCorrect(userAnswers[i] || '', q.answers);
+      const pts     = correct ? q.points : 0;
+      earnedMarks  += pts;
+      answerDetails.push({
+        question  : q.num,
+        text      : q.text,
+        userAnswer: userAnswers[i] || '',
+        correct,
+        points    : pts,
+        maxPoints : q.points,
+        course    : q.course,
+      });
+    });
+
+    const client = getClient();
+    if (!client) {
+      if (btn) { btn.disabled = false; btn.textContent = 'Yes, submit'; }
+      alert('Could not reach the server to submit your test. Please check your internet connection and try again.');
+      return;
+    }
+    try {
+      const { data, error } = await client.rpc('submit_attempt', {
+        p_test_slug: TEST_SLUG, p_email: email,
+        p_score: earnedMarks, p_max_score: totalMarks,
+        p_time_taken_seconds: TIMER_SECONDS_TOTAL - timeRemaining, p_answers: answerDetails,
+      });
+      if (error || !data || data.success !== true) {
+        console.warn('Submission rejected:', error || data);
+        closePopup('popup-confirm');
+        showScreen('locked-screen');
+        return;
+      }
+    } catch (err) {
+      console.warn('Submission error:', err);
+      if (btn) { btn.disabled = false; btn.textContent = 'Yes, submit'; }
+      alert('Could not submit right now \u2014 please check your connection and try again.');
+      return;
+    }
+
+    closePopup('popup-confirm');
+    showResult(name, earnedMarks, totalMarks, answerDetails, timedOut);
+  }
+
+  function showResult(name, earned, total, details, timedOut) {
+    showScreen('result-screen');
+    document.getElementById('result-name').textContent = name;
+
+    const ring = document.getElementById('score-display');
+    ring.style.color = '#0D0080';
+    ring.textContent = `${earned}/${total}`;
+    const label = document.getElementById('score-label');
+    label.innerHTML = timedOut
+      ? `Time's up \u2014 your test was submitted automatically. You scored <strong>${earned} out of ${total}</strong>.`
+      : `You scored <strong>${earned} out of ${total}</strong>.`;
+
+    // Per-course breakdown, computed purely from this attempt's own graded
+    // answers -- shows exactly where the gaps still are.
+    const breakdownWrap = document.getElementById('breakdown-rows');
+    breakdownWrap.innerHTML = '';
+    COURSE_ORDER.forEach(course => {
+      const qs = details.filter(d => d.course === course);
+      if (!qs.length) return;
+      const earnedC = qs.reduce((s, d) => s + d.points, 0);
+      const maxC    = qs.reduce((s, d) => s + d.maxPoints, 0);
+      const correctCount = qs.filter(d => d.correct).length;
+      const pct = maxC ? Math.round((earnedC / maxC) * 100) : 0;
+      const row = document.createElement('div');
+      row.className = 'breakdown-row';
+      row.innerHTML = `
+        <span class="breakdown-label">${course}</span>
+        <span class="breakdown-bar-wrap"><span class="breakdown-bar-fill" style="width:${pct}%;background:${COURSE_COLOURS[course] || '#0D0080'}"></span></span>
+        <span class="breakdown-score">${correctCount}/${qs.length} qs &middot; ${pct}%</span>
+      `;
+      breakdownWrap.appendChild(row);
+    });
+
+    const tbody = document.getElementById('results-body');
+    tbody.innerHTML = '';
+    details.forEach(d => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><strong>${d.question}</strong> &nbsp; ${d.text}</td>
+        <td>${d.userAnswer}</td>
+        <td>${d.correct ? '<span class="tick">\u2713</span>' : '<span class="cross">\u2717</span>'}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  function finishAndClose() {
+    window.location.href = PORTAL_URL;
+  }
+
+</script>
+</body>
+</html>
