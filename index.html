@@ -3,265 +3,35 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>KS2 Arithmetic Test — Steps 2 Success Education</title>
+<meta http-equiv="refresh" content="0; url=start.html">
+<title>Steps 2 Success &mdash; redirecting&hellip;</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,600;0,700;1,700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: Arial, sans-serif; background: #f0f4f8; color: #222; }
-
-  .header-top { background: #003C71; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; }
-  .header-top .left { font-size: 14px; font-weight: bold; color: #fff; letter-spacing: 0.5px; }
-  .header-top .right { font-size: 14px; font-weight: bold; color: #09A59A; letter-spacing: 0.5px; }
-  .header-stripe { height: 5px; background: #09A59A; }
-  .header-logo { background: #fff; padding: 24px 20px 20px; text-align: center; border-bottom: 1px solid #e0e0e0; }
-  .header-logo img { height: auto; width: 60%; max-width: 340px; margin-bottom: 16px; display: block; margin-left: auto; margin-right: auto; }
-  .header-logo h1 { font-size: 28px; font-weight: 900; color: #003C71; letter-spacing: 0.5px; }
-  .header-logo h2 { font-size: 17px; font-weight: normal; color: #555; margin-top: 4px; letter-spacing: 0.5px; }
-
-  .wrap { max-width: 700px; margin: 0 auto; padding: 0 16px 40px; }
-
-  .instructions { background: #fff; border: 2px solid #003C71; border-radius: 6px; padding: 16px 20px; margin: 16px 0; }
-  .instructions h3 { font-size: 15px; font-weight: bold; color: #003C71; margin-bottom: 8px; border-bottom: 1px solid #e0e0e0; padding-bottom: 6px; }
-  .instructions p { font-size: 14px; line-height: 1.7; color: #333; margin-bottom: 4px; }
-  .instructions .note { font-size: 13px; color: #888; margin-top: 8px; font-style: italic; }
-
-  .name-card { background: #fff; border: 1px solid #ccc; border-radius: 6px; padding: 16px 20px; margin-bottom: 16px; }
-  .name-card label { font-size: 14px; font-weight: bold; color: #003C71; display: block; margin-bottom: 6px; }
-  .name-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .name-input { height: 38px; border: 1px solid #aaa; border-radius: 4px; padding: 0 12px; font-size: 15px; width: 100%; }
-  .name-input:focus { outline: none; border-color: #003C71; box-shadow: 0 0 0 2px rgba(0,60,113,0.15); }
-
-  .question-card { background: #fff; border: 1px solid #ccc; border-radius: 6px; padding: 14px 18px; margin-bottom: 10px; }
-  .q-row { display: flex; align-items: center; gap: 10px; }
-  .q-num { font-size: 12px; font-weight: bold; color: #003C71; min-width: 32px; background: #e8f0f8; padding: 3px 6px; border-radius: 4px; text-align: center; }
-  .q-text { font-size: 17px; font-weight: bold; flex: 1; color: #111; }
-  .q-marks { font-size: 12px; color: #888; white-space: nowrap; }
-  .q-input { width: 120px; height: 36px; border: 2px solid #ccc; border-radius: 4px; padding: 0 10px; font-size: 15px; text-align: center; background: #fafafa; color: #111; }
-  .q-input:focus { outline: none; border-color: #09A59A; box-shadow: 0 0 0 2px rgba(9,165,154,0.2); }
-  .feedback { font-size: 13px; margin-top: 8px; padding: 6px 10px; border-radius: 0; display: none; border-left: 3px solid; }
-  .correct { background: #e6f4f1; color: #0a6b5e; border-color: #09A59A; }
-  .incorrect { background: #fde8e8; color: #a01a1a; border-color: #c0392b; }
-
-  .submit-btn { width: 100%; height: 48px; margin-top: 12px; font-size: 16px; font-weight: bold; cursor: pointer; border-radius: 6px; border: none; background: #09A59A; color: #fff; letter-spacing: 0.5px; }
-  .submit-btn:hover { background: #077d74; }
-  .submit-btn:disabled { background: #aaa; cursor: not-allowed; }
-  .sending { font-size: 13px; color: #666; margin-top: 8px; text-align: center; }
-
-  .score-card { display: none; background: #fff; border: 2px solid #003C71; border-radius: 8px; padding: 28px 20px; margin-top: 20px; text-align: center; }
-  .score-card h3 { font-size: 13px; color: #003C71; font-weight: bold; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px; }
-  .score-num { font-size: 52px; font-weight: 900; color: #003C71; }
-  .score-divider { width: 60px; height: 4px; background: #09A59A; margin: 10px auto; border-radius: 2px; }
-  .score-label { font-size: 15px; color: #666; }
-  .score-name { font-size: 16px; color: #333; margin-top: 8px; }
-  .breakdown { margin-top: 20px; text-align: left; border-top: 1px solid #e0e0e0; padding-top: 16px; }
-  .breakdown h4 { font-size: 12px; color: #003C71; font-weight: bold; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
-  .breakdown-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; }
-  .breakdown-item { background: #f0f4f8; border-radius: 4px; padding: 8px 10px; }
-  .breakdown-item .cat { font-size: 11px; color: #666; margin-bottom: 2px; }
-  .breakdown-item .cat-score { font-size: 17px; font-weight: bold; color: #003C71; }
-  .reset-btn { margin-top: 20px; padding: 10px 28px; font-size: 14px; cursor: pointer; border-radius: 6px; border: 2px solid #003C71; background: #fff; color: #003C71; font-weight: bold; }
-  .reset-btn:hover { background: #003C71; color: #fff; }
-
-  .footer { text-align: center; font-size: 12px; color: #999; padding: 20px; }
-  .footer span { color: #09A59A; font-weight: bold; }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    font-family:'DM Sans',Arial,sans-serif;
+    background:#F4F6FB;
+    color:#0D0080;
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:24px;
+  }
+  .box{max-width:420px;}
+  h1{font-family:'Fraunces',Georgia,serif;font-weight:700;font-size:1.4rem;margin-bottom:12px;}
+  p{font-size:.95rem;color:#444;line-height:1.6;}
+  a{color:#1800AB;font-weight:600;}
 </style>
+<script>location.replace('start.html');</script>
 </head>
 <body>
-
-<div class="header-top">
-  <span class="left">KS2 Arithmetic Test</span>
-  <span class="right">Steps 2 Success Education</span>
-</div>
-<div class="header-stripe"></div>
-<div class="header-logo">
-  <img src="logo_cropped.png" alt="Steps 2 Success Education" />
-  <h1>Arithmetic</h1>
-  <h2>Pre-module check</h2>
-</div>
-<div class="header-stripe"></div>
-
-<div class="wrap">
-
-  <div class="instructions">
-    <h3>Instructions</h3>
-    <p>You have <strong>30 minutes</strong> to complete this test.</p>
-    <p>Work as quickly and as carefully as you can.</p>
-    <p>Put your answer in the box for each question.</p>
-    <p>All answers should be given as a single value.</p>
-    <p class="note">Note: this is a digital test. Marks for longer questions are awarded for correct answers only — no partial marks are given.</p>
+  <div class="box">
+    <h1>Taking you to the student portal&hellip;</h1>
+    <p>If you're not redirected automatically, <a href="start.html">click here</a>.</p>
   </div>
-
-  <div class="name-card">
-    <div class="name-row">
-      <div>
-        <label for="firstName">First name</label>
-        <input class="name-input" type="text" id="firstName" placeholder="First name" autocomplete="off" />
-      </div>
-      <div>
-        <label for="lastName">Last name</label>
-        <input class="name-input" type="text" id="lastName" placeholder="Last name" autocomplete="off" />
-      </div>
-    </div>
-  </div>
-
-  <div id="questions"></div>
-
-  <button class="submit-btn" id="submitBtn" onclick="submitQuiz()">Submit answers</button>
-  <p class="sending" id="sendingMsg"></p>
-
-  <div class="score-card" id="scoreCard">
-    <h3>Your result</h3>
-    <div class="score-num" id="scoreNum"></div>
-    <div class="score-divider"></div>
-    <div class="score-label">Total marks</div>
-    <div class="score-name" id="scoreName"></div>
-    <div class="breakdown">
-      <h4>Score by category</h4>
-      <div class="breakdown-grid" id="breakdownGrid"></div>
-    </div>
-    <button class="reset-btn" onclick="resetQuiz()">Try again</button>
-  </div>
-
-</div>
-
-<div class="footer">Powered by <span>Steps 2 Success Education</span> &nbsp;|&nbsp; steps2successedu.com</div>
-
-<script>
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbydhV-_7AdRXAcMSNAWpc6JSIIf2r1PiIoAKgaGG-4-Qvsl3AWwJlFq6dOKkOU8Rn-K/exec';
-
-const questions = [
-  { num:'Q1',  text:'689 + 38 =',                        answers:['727'],                         points:1, cat:'Addition' },
-  { num:'Q2',  text:'72 &divide; 3 =',                   answers:['24'],                          points:1, cat:'Division' },
-  { num:'Q3',  text:'23 &times; 6 =',                    answers:['138'],                         points:1, cat:'Multiplication' },
-  { num:'Q4',  text:'4,532 &minus; 19 =',                answers:['4513','4,513'],                points:1, cat:'Subtraction' },
-  { num:'Q5',  text:'3 &times; 391 =',                   answers:['1173','1,173'],                points:1, cat:'Multiplication' },
-  { num:'Q6',  text:'___ = 9,171 &minus; 530',           answers:['8641','8,641'],                points:1, cat:'Subtraction' },
-  { num:'Q7',  text:'6,600 &divide; 6 =',                answers:['1100','1,100'],                points:1, cat:'Division' },
-  { num:'Q8',  text:'99 &times; 10 &times; 1 =',         answers:['990'],                         points:1, cat:'Multiplication' },
-  { num:'Q9',  text:'7.68 + 13.493 =',                   answers:['21.173'],                      points:1, cat:'Decimals' },
-  { num:'Q10', text:'9 &times; 752 =',                   answers:['6768','6,768'],                points:1, cat:'Multiplication' },
-  { num:'Q11', text:'640 &divide; 8 =',                  answers:['80'],                          points:1, cat:'Division' },
-  { num:'Q12', text:'___ = 357 &minus; 89',              answers:['268'],                         points:1, cat:'Subtraction' },
-  { num:'Q13', text:'561 &divide; 3 =',                  answers:['187'],                         points:1, cat:'Division' },
-  { num:'Q14', text:'4/6 &times; 1/8 =',                 answers:['1/12','4/48','2/24'],          points:1, cat:'Fractions' },
-  { num:'Q15', text:'___ = 630 &divide; 7',              answers:['90'],                          points:1, cat:'Division' },
-  { num:'Q16', text:'6,020,070 = 6,000,000 + ___ + 70',  answers:['20000','20,000'],              points:1, cat:'Addition' },
-  { num:'Q17', text:'2,671 &times; 1,000 =',             answers:['2671000','2,671,000'],         points:1, cat:'Multiplication' },
-  { num:'Q18', text:'5/12 + 1/3 =',                      answers:['3/4','9/12','6/8'],            points:1, cat:'Fractions' },
-  { num:'Q19', text:'2/3 + 4/5 =',                       answers:['22/15','1 7/15'],              points:1, cat:'Fractions' },
-  { num:'Q20', text:'6,312 &times; 14 =',                answers:['88368','88,368'],              points:2, cat:'Multiplication' },
-  { num:'Q21', text:'2 + 3&#179; =',                     answers:['29'],                          points:1, cat:'Order of operations' },
-  { num:'Q22', text:'15.5 &divide; 100 =',               answers:['0.155'],                       points:1, cat:'Decimals' },
-  { num:'Q23', text:'90 &minus; 56 &divide; 8 =',        answers:['83'],                          points:1, cat:'Order of operations' },
-  { num:'Q24', text:'63 &minus; 5.8 =',                  answers:['57.2'],                        points:1, cat:'Decimals' },
-  { num:'Q25', text:'418 &times; 47 =',                  answers:['19646','19,646'],              points:2, cat:'Multiplication' },
-  { num:'Q26', text:'6/7 &minus; 11/21 =',               answers:['7/21','1/3','18/63'],          points:1, cat:'Fractions' },
-  { num:'Q27', text:'7/10 &divide; 2 =',                 answers:['7/20','14/40'],                points:1, cat:'Fractions' },
-  { num:'Q28', text:'2 3/8 &minus; 5/8 =',               answers:['1 6/8','1 3/4','14/8','7/4'], points:1, cat:'Fractions' },
-  { num:'Q29', text:'0.7 &times; 26 =',                  answers:['18.2'],                        points:1, cat:'Decimals' },
-  { num:'Q30', text:'986 &divide; 34 =',                 answers:['29'],                          points:2, cat:'Division' },
-  { num:'Q31', text:'99% of 600 =',                      answers:['594'],                         points:1, cat:'Percentages' },
-  { num:'Q32', text:'1/2 &divide; 3 =',                  answers:['1/6','2/12'],                  points:1, cat:'Fractions' },
-  { num:'Q33', text:'43% of 900 =',                      answers:['387'],                         points:1, cat:'Percentages' },
-  { num:'Q34', text:'2 1/6 &minus; 2/3 =',               answers:['1 1/2','1 3/6','3/2','9/6'],  points:1, cat:'Fractions' },
-  { num:'Q35', text:'1 1/4 &times; 39 =',                answers:['48 3/4','195/4'],              points:1, cat:'Fractions' },
-  { num:'Q36', text:'4,234 &divide; 73 =',               answers:['58'],                          points:2, cat:'Division' }
-];
-
-const categories = ['Addition','Subtraction','Multiplication','Division','Fractions','Decimals','Percentages','Order of operations'];
-const totalPoints = questions.reduce((s,q) => s + q.points, 0);
-
-function normalise(val) {
-  return val.trim().toLowerCase().replace(/,/g,'').replace(/\s+/g,' ');
-}
-function isCorrect(input, answers) {
-  return answers.some(a => normalise(a) === normalise(input));
-}
-
-function buildQuiz() {
-  const container = document.getElementById('questions');
-  container.innerHTML = '';
-  questions.forEach((q, i) => {
-    container.innerHTML += `
-      <div class="question-card">
-        <div class="q-row">
-          <span class="q-num">${q.num}</span>
-          <span class="q-text">${q.text}</span>
-          <span class="q-marks">${q.points === 2 ? '2 marks' : '1 mark'}</span>
-          <input class="q-input" type="text" id="input-${i}" autocomplete="off" />
-        </div>
-        <div class="feedback" id="feedback-${i}"></div>
-      </div>`;
-  });
-}
-
-function submitQuiz() {
-  const firstName = document.getElementById('firstName').value.trim();
-  const lastName = document.getElementById('lastName').value.trim();
-  if (!firstName || !lastName) { alert('Please enter your first and last name before submitting.'); return; }
-  const fullName = firstName + ' ' + lastName;
-
-  let totalScore = 0;
-  const catScores = {};
-  const catMax = {};
-  categories.forEach(c => { catScores[c] = 0; catMax[c] = 0; });
-  const responses = [];
-
-  questions.forEach((q, i) => {
-    catMax[q.cat] += q.points;
-    const val = document.getElementById('input-' + i).value;
-    const fb = document.getElementById('feedback-' + i);
-    fb.style.display = 'block';
-    const correct = isCorrect(val, q.answers);
-    if (correct) { totalScore += q.points; catScores[q.cat] += q.points; }
-    fb.className = 'feedback ' + (correct ? 'correct' : 'incorrect');
-    fb.textContent = correct ? '✓ Correct' : (val.trim() === '' ? 'No answer given. Correct answer: ' + q.answers[0] : '✗ Incorrect. Correct answer: ' + q.answers[0]);
-    responses.push(val || '');
-  });
-
-  document.getElementById('scoreCard').style.display = 'block';
-  document.getElementById('scoreNum').textContent = totalScore + ' / ' + totalPoints;
-  document.getElementById('scoreName').textContent = fullName;
-
-  const grid = document.getElementById('breakdownGrid');
-  grid.innerHTML = '';
-  categories.forEach(c => {
-    if (catMax[c] > 0) {
-      grid.innerHTML += `<div class="breakdown-item"><div class="cat">${c}</div><div class="cat-score">${catScores[c]} / ${catMax[c]}</div></div>`;
-    }
-  });
-
-  document.getElementById('submitBtn').disabled = true;
-  document.getElementById('sendingMsg').textContent = 'Sending results...';
-  sendToSheet(fullName, firstName, lastName, totalScore, catScores, catMax, responses);
-}
-
-function sendToSheet(fullName, firstName, lastName, totalScore, catScores, catMax, responses) {
-  const data = { timestamp: new Date().toISOString(), fullName, firstName, lastName, totalScore, totalMax: totalPoints, catScores, catMax, responses };
-  fetch(SCRIPT_URL, {
-    method: 'POST', mode: 'no-cors',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data)
-  }).then(() => {
-    document.getElementById('sendingMsg').textContent = 'Results sent successfully.';
-  }).catch(() => {
-    document.getElementById('sendingMsg').textContent = 'Could not send results. Please screenshot your score.';
-  });
-}
-
-function resetQuiz() {
-  questions.forEach((q, i) => {
-    document.getElementById('input-' + i).value = '';
-    const fb = document.getElementById('feedback-' + i);
-    fb.style.display = 'none';
-  });
-  document.getElementById('scoreCard').style.display = 'none';
-  document.getElementById('submitBtn').disabled = false;
-  document.getElementById('sendingMsg').textContent = '';
-  document.getElementById('firstName').value = '';
-  document.getElementById('lastName').value = '';
-}
-
-buildQuiz();
-</script>
 </body>
 </html>
