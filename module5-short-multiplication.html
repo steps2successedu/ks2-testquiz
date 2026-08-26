@@ -96,6 +96,7 @@
     /* --- base definitions for injected markup (must come before the design layer) --- */
     .details-bar input[readonly] { background:#E0F9FA; border-color:#5EDDE0; cursor:default; }
     .finish-bar { display:flex; gap:12px; flex-wrap:wrap; margin-top:20px; }
+    .finish-hint { width:100%; font-size:.82rem; color:var(--ink-soft, #4A4A4A); margin-top:2px; }
     #review-incorrect-screen { display:none; }
     .review-incorrect-header {
       background:white; border-radius:10px; padding:24px 28px;
@@ -578,6 +579,7 @@
     <div class="finish-bar" id="result-buttons">
       <button class="btn btn-primary" id="btn-review-incorrect" onclick="showReviewIncorrect()" style="display:none">Review incorrect answers</button>
       <button class="btn btn-outline" onclick="finishAndClose()">Back to lessons</button>
+      <p class="finish-hint">Opened this from a lesson in a new tab? You can just close this tab to go straight back &mdash; no need to click anything else.</p>
     </div>
   </div>
 
@@ -1052,7 +1054,21 @@
 
   function finishAndClose() {
     // The results screen is showing, so the beforeunload guard is already off.
-    window.location.href = LESSONS_URL;
+    // NOTE: a plain target="_blank" link (the normal way to link out of a
+    // Teachable lesson) implies rel="noopener" by default in every modern
+    // browser -- so window.opener is null here even when this genuinely was
+    // opened as a new tab, and the auto-close below essentially never runs.
+    // It's kept as a harmless no-cost fallback in case a future integration
+    // opens this page via window.open() without stripping the opener
+    // reference. In practice, telling the student in plain text that they
+    // can close the tab themselves (see the finish-hint line below) is the
+    // real mechanism -- this button's real job is the redirect.
+    if (window.opener) {
+      window.close();
+      setTimeout(() => { window.location.href = LESSONS_URL; }, 300);
+    } else {
+      window.location.href = LESSONS_URL;
+    }
   }
 
 </script>
