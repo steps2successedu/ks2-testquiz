@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Decimals & Percentages — Course Practice Test | Steps 2 Success</title>
+  <title>Decimals & Percentages: Course Practice Test | Steps 2 Success</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,600;0,700;1,700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
@@ -53,7 +53,7 @@
   <a class="back-link" href="start.html">All tests</a>
   <a class="home-link" href="start.html" aria-label="Back to all tests" title="Back to all tests"><img src="logo_cropped.png" alt="Steps 2 Success" /></a>
   <div>
-    <h1>Decimals & Percentages — Course Practice Test</h1>
+    <h1>Decimals & Percentages: Course Practice Test</h1>
     <p>Unlimited practice &middot; nothing is saved</p>
   </div>
 </header>
@@ -63,7 +63,7 @@
   <div id="screen-start">
     <div class="card">
       <h2>Practice before the course test</h2>
-      <p>These questions regenerate with new numbers every time &mdash; practise as much as you like before taking the timed course test. Nothing here is saved or sent anywhere.</p>
+      <p>These questions regenerate with new numbers every time. Practise as much as you like before taking the timed course test. Nothing here is saved or sent anywhere.</p>
       <p class="practice-prompt">
         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>
         <span><strong>Practice up to 5 times</strong> before completing the actual test. Course tests can only be completed once!</span>
@@ -251,7 +251,7 @@
     const note = document.getElementById('attempts-note');
     const btn = document.getElementById('btn-start');
     if (used >= MAX_ATTEMPTS) {
-      note.textContent = `You've completed ${used} practice run-throughs on this device — time to try the real course test!`;
+      note.textContent = `You've completed ${used} practice run-throughs on this device. Time to try the real course test!`;
       btn.disabled = true;
       btn.textContent = 'Practice limit reached';
     } else {
@@ -332,7 +332,7 @@
     document.getElementById('end-score').textContent = `${score} / ${sequence.length}`;
     const msg = document.getElementById('end-message');
     if (used >= MAX_ATTEMPTS) {
-      msg.textContent = `That's ${used} practice run-throughs on this device — you've reached the limit. Time to take the real course test!`;
+      msg.textContent = `That's ${used} practice run-throughs on this device. You've reached the limit. Time to take the real course test!`;
       document.getElementById('btn-again').disabled = true;
       document.getElementById('btn-again').textContent = 'Practice limit reached';
     } else {
