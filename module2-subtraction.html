@@ -812,6 +812,7 @@
     showScreen('quiz-screen');
     renderQuestion();
     guardNavLinks();
+    updateReturnLinkCopy();
   });
   // The header's "All tests"/logo links both go to start.html. If the student
   // hasn't entered a usable name + email yet, sending them there is a dead
@@ -1208,6 +1209,37 @@
       checkBtn.disabled = true;
     }
   }
+  // The test link always opens in a new tab from inside a specific Teachable
+  // lesson, so document.referrer -- the page the browser says this tab was
+  // opened from -- is that exact lesson's URL. That lets "Back to lessons"
+  // send the student straight back to the module they came from, with no
+  // per-lesson URL to maintain here: it works automatically for every module,
+  // course test and Full Arithmetic Test, present and future. Only trusted if
+  // it points at our own Teachable site; anything else (a bookmark, a link
+  // shared outside Teachable, a referrer stripped by a school network) falls
+  // back to the generic homepage in LESSONS_URL.
+  function getReturnUrl() {
+    try {
+      const ref = document.referrer;
+      if (ref && /^https:\/\/([a-z0-9-]+\.)*steps2successedu\.com\//i.test(ref)) {
+        return ref;
+      }
+    } catch (e) { /* referrer unavailable -- fall through to the generic URL */ }
+    return LESSONS_URL;
+  }
+
+  // Runs once on load: if we know the exact lesson this tab came from, say so
+  // on the results screen, rather than the generic "Back to lessons" wording.
+  function updateReturnLinkCopy() {
+    const returnUrl = getReturnUrl();
+    if (returnUrl === LESSONS_URL) return;
+    document.querySelectorAll('button[onclick="finishAndClose()"]').forEach(btn => {
+      btn.textContent = 'Back to your lesson';
+    });
+    const hint = document.querySelector('.finish-hint');
+    if (hint) hint.textContent = 'This takes you straight back to the lesson you came from.';
+  }
+
   function finishAndClose() {
     // The results screen is showing, so the beforeunload guard is already off.
     // NOTE: a plain target="_blank" link (the normal way to link out of a
@@ -1219,11 +1251,12 @@
     // reference. In practice, telling the student in plain text that they
     // can close the tab themselves (see the finish-hint line below) is the
     // real mechanism -- this button's real job is the redirect.
+    const returnUrl = getReturnUrl();
     if (window.opener) {
       window.close();
-      setTimeout(() => { window.location.href = LESSONS_URL; }, 300);
+      setTimeout(() => { window.location.href = returnUrl; }, 300);
     } else {
-      window.location.href = LESSONS_URL;
+      window.location.href = returnUrl;
     }
   }
 </script>
