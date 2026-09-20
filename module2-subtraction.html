@@ -1219,13 +1219,30 @@
   // it points at our own Teachable site; anything else (a bookmark, a link
   // shared outside Teachable, a referrer stripped by a school network) falls
   // back to the generic homepage in LESSONS_URL.
+  const S2S_DOMAIN_RE = /^https:\/\/([a-z0-9-]+\.)*steps2successedu\.com\//i;
+
   function getReturnUrl() {
+    // 1st choice: an explicit ?return= param, set by the Teachable snippet
+    // itself (it reads window.top.location.href on the lesson page and
+    // attaches it to the link before the student ever clicks it). This is
+    // the reliable path -- document.referrer turned out to only ever report
+    // Teachable's custom-code iframe wrapper (the bare site root), never the
+    // actual lesson page, so it's kept only as a last-resort fallback below
+    // for any link that hasn't been updated with the new snippet yet.
+    try {
+      const qp = new URLSearchParams(window.location.search).get('return');
+      if (qp && S2S_DOMAIN_RE.test(qp)) {
+        return qp;
+      }
+    } catch (e) { /* fall through */ }
+
     try {
       const ref = document.referrer;
-      if (ref && /^https:\/\/([a-z0-9-]+\.)*steps2successedu\.com\//i.test(ref)) {
+      if (ref && S2S_DOMAIN_RE.test(ref)) {
         return ref;
       }
     } catch (e) { /* referrer unavailable -- fall through to the generic URL */ }
+
     return LESSONS_URL;
   }
 
@@ -1238,7 +1255,11 @@
     // Remove the #debug-referrer paragraph (and this block) once the
     // return-to-lesson behaviour is confirmed reliable.
     const debugEl = document.getElementById('debug-referrer-value');
-    if (debugEl) debugEl.textContent = document.referrer || '(empty)';
+    if (debugEl) {
+      const qp = new URLSearchParams(window.location.search).get('return');
+      debugEl.textContent =
+        `?return= "${qp || '(none)'}"  |  document.referrer= "${document.referrer || '(empty)'}"  |  using= "${getReturnUrl()}"`;
+    }
 
     const returnUrl = getReturnUrl();
     if (returnUrl === LESSONS_URL) return;
