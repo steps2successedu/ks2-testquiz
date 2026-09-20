@@ -728,6 +728,7 @@
       <button class="btn btn-primary" id="btn-review-incorrect" onclick="showReviewIncorrect()" style="display:none">Review incorrect answers</button>
       <button class="btn btn-outline" onclick="finishAndClose()">Back to lessons</button>
       <p class="finish-hint">Opened this from a lesson in a new tab? You can just close this tab to go straight back. No need to click anything else.</p>
+      <p class="finish-hint" id="debug-referrer" style="opacity:.55">Debug — referrer seen: <code id="debug-referrer-value"></code></p>
     </div>
   </div>
   <div id="review-incorrect-screen">
@@ -1231,6 +1232,14 @@
   // Runs once on load: if we know the exact lesson this tab came from, say so
   // on the results screen, rather than the generic "Back to lessons" wording.
   function updateReturnLinkCopy() {
+    // TEMPORARY debug line -- shows the raw document.referrer value on the
+    // results screen so we can see exactly what the browser captured on
+    // each test run, rather than inferring it from where the button lands.
+    // Remove the #debug-referrer paragraph (and this block) once the
+    // return-to-lesson behaviour is confirmed reliable.
+    const debugEl = document.getElementById('debug-referrer-value');
+    if (debugEl) debugEl.textContent = document.referrer || '(empty)';
+
     const returnUrl = getReturnUrl();
     if (returnUrl === LESSONS_URL) return;
     document.querySelectorAll('button[onclick="finishAndClose()"]').forEach(btn => {
