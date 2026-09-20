@@ -54,7 +54,7 @@
   <a class="home-link" href="start.html" aria-label="Back to all tests" title="Back to all tests"><img src="logo_cropped.png" alt="Steps 2 Success" /></a>
   <div>
     <h1>Addition & Subtraction: Course Practice Test</h1>
-    <p>Unlimited practice &middot; nothing is saved</p>
+    <p>Low-stakes practice &middot; nothing is saved</p>
   </div>
 </header>
 
@@ -82,10 +82,8 @@
       <span class="q-meta" id="q-meta"></span>
       <div class="q-text" id="q-text"></div>
       <input class="answer-input" type="text" id="answer-input" placeholder="Your answer" autocomplete="off" autocorrect="off" spellcheck="false" />
-      <div class="feedback" id="feedback"></div>
       <div class="nav-row">
-        <button class="btn btn-primary" id="btn-check" onclick="checkAnswer()">Check answer</button>
-        <button class="btn btn-secondary" id="btn-nextq" onclick="nextQuestion()" style="display:none">Next →</button>
+        <button class="btn btn-secondary" id="btn-nextq" onclick="advanceQuestion()" disabled>Next →</button>
       </div>
     </div>
   </div>
@@ -279,8 +277,10 @@
     renderQuestion();
   }
 
+  // No per-question reveal: correctness is tallied silently and only the
+  // final score is shown at the end, so practice is an honest full attempt
+  // rather than a series of hinted guesses.
   function renderQuestion() {
-    answered = false;
     const skill = sequence[currentIndex];
     currentGen = GENERATORS[skill]();
     document.getElementById('q-counter').textContent = `Question ${currentIndex + 1} of ${sequence.length}`;
@@ -290,34 +290,20 @@
     input.value = '';
     input.disabled = false;
     input.focus();
-    document.getElementById('feedback').textContent = '';
-    document.getElementById('feedback').className = 'feedback';
-    document.getElementById('btn-check').style.display = 'inline-block';
-    document.getElementById('btn-nextq').style.display = 'none';
-    input.onkeydown = e => { if (e.key === 'Enter') { if (!answered) checkAnswer(); else nextQuestion(); } };
+    const nextBtn = document.getElementById('btn-nextq');
+    nextBtn.textContent = currentIndex === sequence.length - 1 ? 'Finish →' : 'Next →';
+    nextBtn.disabled = true;
+    input.oninput = () => { nextBtn.disabled = input.value.trim() === ''; };
+    input.onkeydown = e => { if (e.key === 'Enter' && !nextBtn.disabled) advanceQuestion(); };
   }
 
-  function checkAnswer() {
-    if (answered) return;
+  function advanceQuestion() {
     const input = document.getElementById('answer-input');
     const val = input.value.trim();
     if (!val) return;
-    answered = true;
+    if (currentGen.check(val)) score++;
     input.disabled = true;
-    const ok = currentGen.check(val);
-    const fb = document.getElementById('feedback');
-    if (ok) {
-      score++;
-      fb.textContent = '✓ Correct!';
-      fb.className = 'feedback correct';
-    } else {
-      fb.textContent = `✗ Not quite. The answer was ${currentGen.correct}.`;
-      fb.className = 'feedback incorrect';
-    }
-    document.getElementById('btn-check').style.display = 'none';
-    document.getElementById('btn-nextq').style.display = 'inline-block';
-    document.getElementById('btn-nextq').textContent = currentIndex === sequence.length - 1 ? 'See my score →' : 'Next →';
-    document.getElementById('btn-nextq').focus();
+    nextQuestion();
   }
 
   function nextQuestion() {

@@ -610,6 +610,15 @@
     </div>
   </div>
 </div>
+<div class="overlay" id="popup-need-details">
+  <div class="popup">
+    <h3>Just one thing first</h3>
+    <p>Please fill in your full name and email address in the boxes above before heading back to all tests. That's how we keep your test saved and matched to you.</p>
+    <div class="popup-buttons">
+      <button class="btn btn-primary" onclick="closeNeedDetailsPopup()">Got it</button>
+    </div>
+  </div>
+</div>
 
 <script>
   const questions = [
@@ -656,6 +665,8 @@
     prefillFromPortal();
     showScreen('quiz-screen');
     renderQuestion();
+    guardNavLinks();
+    updateReturnLinkCopy();
   });
 
   // If the student arrived here from the Steps 2 Success test list (start.html),
@@ -709,11 +720,51 @@
     if (inProgress) { e.preventDefault(); e.returnValue = ''; }
   });
 
+  // The header's "All tests"/logo links both go to start.html. If the student
+  // hasn't entered a usable name + email yet, sending them there is a dead
+  // end (the portal will just ask again with nothing carried over) -- so
+  // intercept the click and prompt them to fill the boxes in first, instead
+  // of silently bouncing them to another page.
+  function guardNavLinks() {
+    document.querySelectorAll('.back-link, .home-link').forEach(el => {
+      el.addEventListener('click', e => {
+        const { name, email } = getDetails();
+        const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        if (name && emailOk) return; // have a usable identity, let it navigate normally
+        e.preventDefault();
+        document.getElementById('popup-need-details').classList.add('active');
+      });
+    });
+  }
+  function closeNeedDetailsPopup() {
+    closePopup('popup-need-details');
+    const nameEl = document.getElementById('student-name');
+    if (nameEl && !nameEl.readOnly) nameEl.focus();
+  }
+  // Mirror of the portal's own login write: whenever this page has a plausible
+  // name + email (typed here directly, since most students land on a specific
+  // test straight from a Teachable link rather than via start.html first), save
+  // it to the same sessionStorage key the portal reads. Without this, a student
+  // who never visited start.html first would type their details here, take the
+  // test, then click the logo and be asked to type them again -- the identity
+  // was only ever local to this page. Skipped once the fields are read-only
+  // (already came from the portal, so it's already saved).
+  function persistIdentityIfValid() {
+    const nameEl  = document.getElementById('student-name');
+    const emailEl = document.getElementById('student-email');
+    if (!nameEl || !emailEl || nameEl.readOnly || emailEl.readOnly) return;
+    const name  = nameEl.value.trim();
+    const email = emailEl.value.trim();
+    if (!name || !email || !email.includes('@')) return;
+    try { sessionStorage.setItem('s2s_student', JSON.stringify({ name, email })); }
+    catch (e) { /* storage unavailable — identity just won't carry over, quiz still works */ }
+  }
   function onDetailsInput() {
     const nameEl  = document.getElementById('student-name');
     const emailEl = document.getElementById('student-email');
     nameEl.classList.toggle('filled', !!nameEl.value.trim());
     emailEl.classList.toggle('filled', !!emailEl.value.trim());
+    persistIdentityIfValid();
     maybeCheckStatus();
   }
 
@@ -1052,22 +1103,59 @@
     }
   }
 
+  const S2S_DOMAIN_RE = /^https:\/\/([a-z0-9-]+\.)*steps2successedu\.com\//i;
+
+  // Where the "back" button on the results screen sends the student.
+  //
+  // 1st choice: an explicit ?return= parameter. The Teachable lesson's own
+  // snippet reads window.top.location.href (the real lecture URL) and pins it
+  // onto this page's link before the student ever clicks it, so we get the
+  // exact lesson back with no per-lesson URL table to maintain here.
+  //
+  // 2nd choice: document.referrer -- kept only as a fallback for any lesson
+  // whose snippet hasn't been updated yet. It is NOT reliable on its own:
+  // Teachable renders custom code blocks inside an iframe whose own address
+  // is just the bare site root, so the referrer reports the site root rather
+  // than the lecture the student was actually looking at.
+  //
+  // Last resort: LESSONS_URL, exactly as this page behaved before.
+  function getReturnUrl() {
+    try {
+      const qp = new URLSearchParams(window.location.search).get('return');
+      if (qp && S2S_DOMAIN_RE.test(qp)) return qp;
+    } catch (e) { /* fall through */ }
+    try {
+      const ref = document.referrer;
+      if (ref && S2S_DOMAIN_RE.test(ref)) return ref;
+    } catch (e) { /* fall through */ }
+    return LESSONS_URL;
+  }
+
+  // Runs once on load: when we know the exact lesson this tab came from, say
+  // so on the results screen rather than using the vaguer default wording.
+  function updateReturnLinkCopy() {
+    if (getReturnUrl() === LESSONS_URL) return;
+    document.querySelectorAll('button[onclick="finishAndClose()"]').forEach(btn => {
+      btn.textContent = 'Back to your lesson';
+    });
+    const hint = document.querySelector('.finish-hint');
+    if (hint) hint.textContent = 'This takes you straight back to the lesson you came from.';
+  }
+
   function finishAndClose() {
-    // The results screen is showing, so the beforeunload guard is already off.
     // NOTE: a plain target="_blank" link (the normal way to link out of a
     // Teachable lesson) implies rel="noopener" by default in every modern
     // browser -- so window.opener is null here even when this genuinely was
     // opened as a new tab, and the auto-close below essentially never runs.
     // It's kept as a harmless no-cost fallback in case a future integration
     // opens this page via window.open() without stripping the opener
-    // reference. In practice, telling the student in plain text that they
-    // can close the tab themselves (see the finish-hint line below) is the
-    // real mechanism -- this button's real job is the redirect.
+    // reference. This button's real job is the redirect.
+    const returnUrl = getReturnUrl();
     if (window.opener) {
       window.close();
-      setTimeout(() => { window.location.href = LESSONS_URL; }, 300);
+      setTimeout(() => { window.location.href = returnUrl; }, 300);
     } else {
-      window.location.href = LESSONS_URL;
+      window.location.href = returnUrl;
     }
   }
 
