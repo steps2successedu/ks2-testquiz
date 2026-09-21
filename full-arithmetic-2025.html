@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Full Arithmetic Test: 2025 | Steps 2 Success</title>
+  <title>Full Arithmetic Test 2 | Steps 2 Success</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,600;0,700;1,700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
@@ -367,7 +367,7 @@
   <a class="back-link" href="start.html">All tests</a>
   <a class="home-link" href="start.html" aria-label="Back to all tests" title="Back to all tests"><img src="logo_cropped.png" alt="Steps 2 Success" /></a>
   <div>
-    <h1>Full Arithmetic Test: 2025</h1>
+    <h1>Full Arithmetic Test 2</h1>
     <p>Full Arithmetic Test &middot; 30 minutes</p>
   </div>
 </header>
@@ -382,8 +382,8 @@
 
   <div id="modules-incomplete-screen">
     <div class="lock-icon">📚</div>
-    <h2>Finish every module test first</h2>
-    <p>The full arithmetic tests unlock once every module test across all four courses has been completed. They cover every topic, so they're a full-course check.<br>
+    <h2>Finish the Multiplication & Division modules first</h2>
+    <p>This paper unlocks once you have finished every module test in the Multiplication & Division course. It covers all four courses, not just this one, so expect questions on topics you have not been taught yet. That is deliberate: it shows how close you are getting to the real SATs paper.<br>
        You still have <strong id="incomplete-count">some module tests</strong> left to finish.</p>
     <a class="btn-outline" href="start.html">Back to your tests</a>
   </div>
@@ -458,7 +458,7 @@
       <div class="breakdown-note">
         <h3>Your score by topic</h3>
         <div id="breakdown-rows"></div>
-        <p class="breakdown-hint">This shows exactly where your gaps still are. A low score in one area is a good sign of where to focus next, whether that's revisiting the lessons or trying a course practice test.</p>
+        <p class="breakdown-hint">This is the second of four full papers. It covers all four courses, so there will still be topics you have not reached yet. Compare it against your first paper: the difference between them is your progress. A low score in one area shows where to focus next, whether that is revisiting the lessons or trying a course practice test.</p>
       </div>
     </div>
     <table class="results-table">
@@ -983,7 +983,7 @@
     ring.textContent = `${earned}/${total}`;
     const label = document.getElementById('score-label');
     label.innerHTML = timedOut
-      ? `Time's up \u2014 your test was submitted automatically. You scored <strong>${earned} out of ${total}</strong>.`
+      ? `Time's up. Your test was submitted automatically, and you scored <strong>${earned} out of ${total}</strong>.`
       : `You scored <strong>${earned} out of ${total}</strong>.`;
 
     // Per-course breakdown, computed purely from this attempt's own graded

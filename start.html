@@ -780,8 +780,8 @@
         [1, 'module1-addition', 'Addition', 8, 8],
         [2, 'module2-subtraction', 'Subtraction & Inverse', 12, 12],
       ],
-      courseTest: ['addition-subtraction-course', 'Addition & Subtraction — Course Test', 20, 20],
-      practiceTest: ['addition-subtraction-practice', 'Addition & Subtraction — Course Practice Test'],
+      courseTest: ['addition-subtraction-course', 'Addition & Subtraction: Course Test', 20, 20],
+      practiceTest: ['addition-subtraction-practice', 'Addition & Subtraction: Course Practice Test'],
     },
     {
       name: 'Multiplication & Division',
@@ -797,8 +797,8 @@
         [10, 'module10-short-division-two-digits', 'Short Division by Two Digits', 6, 12],
         [11, 'module11-order-of-operations', 'Order of Operations', 6, 6],
       ],
-      courseTest: ['multiplication-division-course', 'Multiplication & Division — Course Test', 20, 24],
-      practiceTest: ['multiplication-division-practice', 'Multiplication & Division — Course Practice Test'],
+      courseTest: ['multiplication-division-course', 'Multiplication & Division: Course Test', 20, 24],
+      practiceTest: ['multiplication-division-practice', 'Multiplication & Division: Course Practice Test'],
     },
     {
       name: 'Fractions',
@@ -810,8 +810,8 @@
         [15, 'module15-multiplying-fractions', 'Multiplying Fractions', 9, 9],
         [16, 'module16-dividing-fractions', 'Dividing Fractions', 6, 6],
       ],
-      courseTest: ['fractions-course', 'Fractions — Course Test', 20, 20],
-      practiceTest: ['fractions-practice', 'Fractions — Course Practice Test'],
+      courseTest: ['fractions-course', 'Fractions: Course Test', 20, 20],
+      practiceTest: ['fractions-practice', 'Fractions: Course Practice Test'],
     },
     {
       name: 'Decimals & Percentages',
@@ -821,15 +821,18 @@
         [18, 'module18-multiplying-decimals', 'Multiplying Decimals', 6, 6],
         [19, 'module19-percentages', 'Percentages', 6, 6],
       ],
-      courseTest: ['decimals-percentages-course', 'Decimals & Percentages — Course Test', 20, 20],
-      practiceTest: ['decimals-percentages-practice', 'Decimals & Percentages — Course Practice Test'],
+      courseTest: ['decimals-percentages-course', 'Decimals & Percentages: Course Test', 20, 20],
+      practiceTest: ['decimals-percentages-practice', 'Decimals & Percentages: Course Practice Test'],
     },
   ];
 
   /* Full arithmetic tests: whole-syllabus SATs-style papers (36 Qs / 40 marks / 30 min,
-     one attempt, gated behind ALL 19 module tests across every course). One test lives
-     under each course tab (not repeated on all four) -- the year is an internal detail
-     only, never shown to students. */
+     one attempt). One paper sits under each course tab and is gated behind THAT
+     course's modules only (changed 21 Sep 2026 -- was all 19 across every course).
+     They are whole-syllabus papers sat once after each course as a repeated progress
+     measure: the student is expected to score low on the first and watch it climb.
+     Gating cumulatively would lock a single-course buyer out of their own paper, so
+     each gates on its own course. The build year is internal and never shown. */
   const FULL_TEST_BY_COURSE = {
     'Addition & Subtraction':    'full-arithmetic-2026',
     'Multiplication & Division': 'full-arithmetic-2025',
@@ -837,6 +840,16 @@
     'Decimals & Percentages':    'full-arithmetic-2023',
   };
   const FULL_TEST_SLUGS = Object.values(FULL_TEST_BY_COURSE);
+
+  /* Which paper in the sequence each course's full test is. The number is real
+     structure here, not decoration: these are four measurements of the same
+     thing taken at four points, and the student is meant to compare them. */
+  const FULL_TEST_NUMBER = {
+    'Addition & Subtraction':    1,
+    'Multiplication & Division': 2,
+    'Fractions':                 3,
+    'Decimals & Percentages':    4,
+  };
 
   const ARROW = '<svg class="arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>';
   const INFO_ICON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>';
@@ -914,7 +927,7 @@
     const fullTestSlug = FULL_TEST_BY_COURSE[c.name];
     const fullTestCard = fullTestSlug ? `<a class="test-card feature" data-slug="${esc(fullTestSlug)}" href="${esc(fullTestSlug)}.html">
           <span class="n">Full Test</span>
-          <span class="t">Full Arithmetic Test</span>
+          <span class="t">Full Arithmetic Test ${FULL_TEST_NUMBER[c.name] || ''}</span>
           <span class="q">36 questions &middot; 40 marks &middot; 30 min</span>
           ${ARROW}
         </a>` : '';
@@ -965,12 +978,12 @@
             <div class="section-label">
               <span class="txt">Full Arithmetic Test</span>
               <span class="rule"></span>
-              <span class="hint">Sit once every module is done, across all 4 courses</span>
+              <span class="hint">Sit this once you have finished this course</span>
             </div>
             <div class="test-grid">${fullTestCard}</div>
             <p class="full-test-invite">
               ${SPARK_ICON}
-              <span>Want to test your progress? Complete a full arithmetic test to see where you&rsquo;ve improved &mdash; and where you still need our help.</span>
+              <span>A full SATs-style paper covering all four courses, not just this one. You have not been taught all of it yet, so expect plenty you cannot do. That is the point: sit one after each course and watch your score climb.</span>
             </p>
           </div>` : ''}
         </div>
@@ -1088,12 +1101,13 @@
     }
 
     /* Full arithmetic test lock: mirrors the server-side rule for test_type='full'
-       in start_or_resume_attempt -- gated behind EVERY module test across ALL
-       4 courses, not just the active tab's. Same UX-affordance-only caveat as above. */
-    const allModulesTotal = COURSES.reduce((sum, cc) => sum + cc.tests.length, 0);
-    const allModulesDone = COURSES.reduce((sum, cc) =>
-      sum + cc.tests.filter(([, slug]) => map[slug] === 'submitted').length, 0);
-    if (allModulesDone < allModulesTotal) {
+       in start_or_resume_attempt. Changed 21 Sep 2026 -- each paper is gated behind
+       its OWN course's modules (the ones on this tab), not all 19 across every
+       course, so it can be sat as a progress check after each course rather than
+       only at the very end. Same UX-affordance-only caveat as above. */
+    const fatTotal = course ? course.tests.length : 0;
+    const fatDone  = course ? course.tests.filter(([, slug]) => map[slug] === 'submitted').length : 0;
+    if (course && fatDone < fatTotal) {
       document.querySelectorAll('#course-sections .test-card[data-slug^="full-arithmetic-"]').forEach(card => {
         if (card.classList.contains('done') || card.classList.contains('resume')) return;
         card.classList.add('locked');
@@ -1104,7 +1118,7 @@
         const old = card.querySelector('.status');
         if (old) old.remove();
         card.insertAdjacentHTML('beforeend',
-          `<span class="status locked">${LOCK} ${allModulesDone} of ${allModulesTotal} modules done</span>`);
+          `<span class="status locked">${LOCK} ${fatDone} of ${fatTotal} modules done</span>`);
       });
     }
   }
